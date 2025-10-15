@@ -1,81 +1,24 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cờ Caro — AI Thông Minh</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cờ Ca Rô AI 100%</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div class="brand">Cờ Caro • AI Master</div>
-    <div class="user-area">
-      <span id="userLabel"></span>
-      <button id="btnOpenLogin">Đăng nhập</button>
-      <button id="btnLogout" style="display:none">Đăng xuất</button>
+  <div class="container">
+    <h1>🤖 CỜ CA RÔ SIÊU TRÍ TUỆ</h1>
+    <div class="game-area">
+      <div id="board"></div>
     </div>
-  </header>
-
-  <main>
-    <section class="panel">
-      <h2>Chơi ngay — Người (X) vs Máy (O)</h2>
-      <div class="controls">
-        <label>Chọn kích thước bàn:
-          <select id="sizeSelect">
-            <option value="13">13 × 13</option>
-            <option value="15" selected>15 × 15</option>
-            <option value="19">19 × 19</option>
-          </select>
-        </label>
-        <label>Độ khó:
-          <select id="difficulty">
-            <option value="1">Dễ</option>
-            <option value="2">Trung bình</option>
-            <option value="3" selected>Khó</option>
-            <option value="4">Siêu</option>
-          </select>
-        </label>
-        <button id="newGame">Bắt đầu</button>
-      </div>
-
-      <div id="gameArea">
-        <div id="boardWrapper">
-          <div id="board" role="grid" aria-label="Bàn cờ"></div>
-        </div>
-        <aside class="side">
-          <div id="status">Trạng thái: Chưa bắt đầu</div>
-          <div class="tips">
-            <strong>Mẹo:</strong>
-            <ul>
-              <li>Nhấn vào ô để đánh (X). Máy sẽ đánh O.</li>
-              <li>AI chặn nước thắng và tìm nước thắng ngay.</li>
-              <li>Đăng nhập để lưu trạng thái người chơi (local).</li>
-            </ul>
-          </div>
-          <button id="resetBtn">Chơi lại</button>
-        </aside>
-      </div>
-    </section>
-  </main>
-
-  <footer>Cre: Nguyễn Hải Huy • Local demo (login lưu localStorage)</footer>
-
-  <!-- Login modal -->
-  <div id="loginModal" class="modal hidden">
-    <div class="modal-card">
-      <h3>Đăng nhập / Đăng ký</h3>
-      <label>Tên đăng nhập <input id="inpUser" /></label>
-      <label>Mật khẩu <input id="inpPass" type="password" /></label>
-      <div class="modal-actions">
-        <button id="btnRegister">Đăng ký</button>
-        <button id="btnLogin">Đăng nhập</button>
-        <button id="btnClose">Đóng</button>
-      </div>
-      <div id="loginMsg" class="msg"></div>
-      <small>Chú ý: đây là demo client-side — không an toàn cho production.</small>
+    <div class="controls">
+      <p id="status">Người chơi đi trước!</p>
+      <button id="reset">🔁 Chơi lại</button>
     </div>
   </div>
 
+  <footer>© 2025 Nguyễn Hải Huy | AI by ChatGPT</footer>
   <script src="script.js"></script>
 </body>
 </html>
