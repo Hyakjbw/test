@@ -1,6 +1,7 @@
 const boardSize = 20;
 let board = Array(boardSize).fill().map(() => Array(boardSize).fill(""));
 let gameOver = false;
+let lastAIMove = null; // 👈 Lưu ô AI vừa đánh
 
 const boardEl = document.getElementById("board");
 const statusEl = document.getElementById("status");
@@ -46,6 +47,7 @@ function aiMove() {
 
   if (move) {
     board[move.i][move.j] = "O";
+    lastAIMove = move; // 👈 Ghi lại ô vừa đánh để làm sáng
     render();
     if (checkWin(move.i, move.j, "O")) {
       statusEl.textContent = "🤖 AI thắng! Không thể chống lại trí tuệ nhân tạo!";
@@ -192,6 +194,11 @@ function render() {
     const j = idx % boardSize;
     cell.textContent = board[i][j];
     cell.className = `cell ${board[i][j].toLowerCase()}`;
+    
+    // 🌟 Làm sáng ô AI vừa đánh
+    if (lastAIMove && i === lastAIMove.i && j === lastAIMove.j) {
+      cell.classList.add("ai-highlight");
+    }
   });
 }
 
@@ -219,6 +226,7 @@ document.querySelectorAll(".cell").forEach(cell => {
 resetBtn.addEventListener("click", () => {
   board = Array(boardSize).fill().map(() => Array(boardSize).fill(""));
   gameOver = false;
+  lastAIMove = null; // reset highlight
   statusEl.textContent = "Người chơi đi trước!";
   render();
 });
