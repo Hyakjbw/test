@@ -14,9 +14,7 @@ for (let i = 0; i < boardSize * boardSize; i++) {
 }
 
 function checkWin(x, y, player) {
-  const dirs = [
-    [1, 0], [0, 1], [1, 1], [1, -1]
-  ];
+  const dirs = [[1,0],[0,1],[1,1],[1,-1]];
   for (let [dx, dy] of dirs) {
     let count = 1;
     for (let dir of [-1, 1]) {
@@ -37,23 +35,11 @@ function checkWin(x, y, player) {
   return false;
 }
 
+// 🧠 AI đánh gần người chơi
 function aiMove() {
-  let bestScore = -Infinity;
-  let move = null;
+  let move = findBestMoveNearPlayer();
+  if (!move) move = findAnyMove(); // fallback nếu không tìm được gần
 
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j] === "") {
-        board[i][j] = "O";
-        let score = minimax(board, 0, false, -Infinity, Infinity);
-        board[i][j] = "";
-        if (score > bestScore) {
-          bestScore = score;
-          move = { i, j };
-        }
-      }
-    }
-  }
   if (move) {
     board[move.i][move.j] = "O";
     render();
@@ -64,32 +50,42 @@ function aiMove() {
   }
 }
 
-function minimax(board, depth, isMax, alpha, beta) {
-  if (depth > 2) return 0;
-  if (gameOver) return 0;
-  let best = isMax ? -Infinity : Infinity;
+// tìm gần nước đi của người chơi
+function findBestMoveNearPlayer() {
+  let lastMove = getLastPlayerMove();
+  if (!lastMove) return null;
 
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j] === "") {
-        board[i][j] = isMax ? "O" : "X";
-        const won = checkWin(i, j, isMax ? "O" : "X");
-        let score = 0;
-        if (won) score = isMax ? 100 - depth : -100 + depth;
-        else score = minimax(board, depth + 1, !isMax, alpha, beta);
-        board[i][j] = "";
-        if (isMax) {
-          best = Math.max(best, score);
-          alpha = Math.max(alpha, score);
-        } else {
-          best = Math.min(best, score);
-          beta = Math.min(beta, score);
+  const { x, y } = lastMove;
+  const range = 2; // phạm vi gần người chơi
+
+  for (let dist = 1; dist <= range; dist++) {
+    for (let i = x - dist; i <= x + dist; i++) {
+      for (let j = y - dist; j <= y + dist; j++) {
+        if (i >= 0 && j >= 0 && i < boardSize && j < boardSize && board[i][j] === "") {
+          return { i, j };
         }
-        if (beta <= alpha) break;
       }
     }
   }
-  return best;
+  return null;
+}
+
+function getLastPlayerMove() {
+  for (let i = boardSize - 1; i >= 0; i--) {
+    for (let j = boardSize - 1; j >= 0; j--) {
+      if (board[i][j] === "X") return { x: i, y: j };
+    }
+  }
+  return null;
+}
+
+function findAnyMove() {
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      if (board[i][j] === "") return { i, j };
+    }
+  }
+  return null;
 }
 
 function render() {
@@ -102,6 +98,7 @@ function render() {
   });
 }
 
+// Sửa lỗi click không hoạt động
 document.querySelectorAll(".cell").forEach(cell => {
   cell.addEventListener("click", () => {
     if (gameOver) return;
@@ -116,7 +113,7 @@ document.querySelectorAll(".cell").forEach(cell => {
         gameOver = true;
         return;
       }
-      aiMove();
+      setTimeout(aiMove, 300);
     }
   });
 });
