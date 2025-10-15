@@ -1,1 +1,80 @@
-test
+body {
+  background: #121212;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+}
+
+h1 {
+  color: #00eaff;
+  text-shadow: 0 0 10px #00ffff;
+  margin-top: 15px;
+}
+
+#board-container {
+  overflow: auto;
+  touch-action: pinch-zoom;
+  margin: 0 auto;
+  width: 95vw;
+  max-width: 800px;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background: #1a1a1a;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(50, 28px);
+  justify-content: center;
+  margin: 0 auto;
+  gap: 1px;
+  transform-origin: center center;
+}
+
+.cell {
+  width: 28px;
+  height: 28px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cell:hover {
+  background: #272727;
+}
+
+.x {
+  color: #ff4f6d;
+}
+
+.o {
+  color: #00eaff;
+}
+
+#status {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #00eaff;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #00ffaa;
+}
+
+footer {
+  margin-top: 20px;
+  color: #888;
+  font-size: 14px;
+}
