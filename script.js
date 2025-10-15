@@ -1,18 +1,15 @@
-const size = 50;
-let board = [];
+const size = 20; // Giới hạn bàn cờ 20x20 gọn trong khung
+let board = Array(size).fill().map(() => Array(size).fill(""));
 let currentPlayer = "X";
 let gameOver = false;
-let offsetX = 0, offsetY = 0, scale = 1, rotation = 0;
-let isDragging = false, lastX, lastY;
 
 const boardElement = document.getElementById("board");
 const statusText = document.getElementById("status");
 const resetBtn = document.getElementById("reset");
 
+// Tạo bàn cờ
 for (let i = 0; i < size; i++) {
-  board[i] = [];
   for (let j = 0; j < size; j++) {
-    board[i][j] = "";
     const cell = document.createElement("div");
     cell.classList.add("cell");
     cell.addEventListener("click", () => handleClick(i, j, cell));
@@ -20,8 +17,10 @@ for (let i = 0; i < size; i++) {
   }
 }
 
+// Khi người chơi click
 function handleClick(i, j, cell) {
   if (gameOver || board[i][j] !== "") return;
+
   board[i][j] = currentPlayer;
   cell.textContent = currentPlayer;
   cell.classList.add(currentPlayer.toLowerCase());
@@ -32,10 +31,11 @@ function handleClick(i, j, cell) {
     return;
   }
 
-  currentPlayer = currentPlayer === "X" ? "O" : "X";
-  if (currentPlayer === "O") aiMove();
+  currentPlayer = "O";
+  aiMove();
 }
 
+// --- AI thông minh ---
 function aiMove() {
   let bestScore = -Infinity;
   let move = null;
@@ -43,9 +43,13 @@ function aiMove() {
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       if (board[i][j] === "") {
+        // Chỉ đánh gần khu vực có người chơi
+        if (!hasNeighbor(i, j, 2)) continue;
+
         board[i][j] = "O";
-        let score = evaluate(i, j, "O");
+        let score = evaluateMove(i, j, "O") + evaluateMove(i, j, "X") * 1.2;
         board[i][j] = "";
+
         if (score > bestScore) {
           bestScore = score;
           move = [i, j];
@@ -54,108 +58,95 @@ function aiMove() {
     }
   }
 
-  if (move) {
-    const idx = move[0] * size + move[1];
-    const cell = boardElement.children[idx];
-    board[move[0]][move[1]] = "O";
-    cell.textContent = "O";
-    cell.classList.add("o");
+  if (!move) return;
 
-    if (checkWin(move[0], move[1])) {
-      statusText.textContent = "🤖 AI thắng rồi!";
-      gameOver = true;
-    } else currentPlayer = "X";
-  }
+  const [x, y] = move;
+  board[x][y] = "O";
+  const idx = x * size + y;
+  const cell = boardElement.children[idx];
+  cell.textContent = "O";
+  cell.classList.add("o");
+
+  if (checkWin(x, y)) {
+    statusText.textContent = "🤖 AI thắng rồi!";
+    gameOver = true;
+  } else currentPlayer = "X";
 }
 
-function evaluate(x, y, player) {
-  let score = 0;
-  const dirs = [
-    [1, 0],
-    [0, 1],
-    [1, 1],
-    [1, -1],
-  ];
-
-  for (const [dx, dy] of dirs) {
-    let count = 1;
-
-    for (let k = 1; k < 5; k++) {
-      const nx = x + dx * k, ny = y + dy * k;
-      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
-      count++;
+// --- Chỉ xét vị trí gần nước đã đánh ---
+function hasNeighbor(x, y, dist) {
+  for (let dx = -dist; dx <= dist; dx++) {
+    for (let dy = -dist; dy <= dist; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < size && ny < size) {
+        if (board[nx][ny] !== "") return true;
+      }
     }
-    for (let k = 1; k < 5; k++) {
-      const nx = x - dx * k, ny = y - dy * k;
-      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
-      count++;
-    }
-    score = Math.max(score, count);
-  }
-  return score;
-}
-
-function checkWin(x, y) {
-  const player = board[x][y];
-  const dirs = [
-    [1, 0],
-    [0, 1],
-    [1, 1],
-    [1, -1],
-  ];
-
-  for (const [dx, dy] of dirs) {
-    let count = 1;
-    for (let k = 1; k < 5; k++) {
-      const nx = x + dx * k, ny = y + dy * k;
-      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
-      count++;
-    }
-    for (let k = 1; k < 5; k++) {
-      const nx = x - dx * k, ny = y - dy * k;
-      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
-      count++;
-    }
-    if (count >= 5) return true;
   }
   return false;
 }
 
-resetBtn.addEventListener("click", () => location.reload());
+// --- Đánh giá chiến lược AI ---
+function evaluateMove(x, y, player) {
+  const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+  let score = 0;
 
-// ----- Kéo / zoom / xoay khung -----
-const container = document.getElementById("board-container");
+  for (const [dx, dy] of dirs) {
+    let count = 1;
+    let open = 0;
 
-container.addEventListener("pointerdown", (e) => {
-  isDragging = true;
-  lastX = e.clientX;
-  lastY = e.clientY;
-  container.style.cursor = "grabbing";
-});
+    for (let k = 1; k < 5; k++) {
+      const nx = x + dx * k, ny = y + dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size) break;
+      if (board[nx][ny] === player) count++;
+      else if (board[nx][ny] === "") { open++; break; }
+      else break;
+    }
 
-container.addEventListener("pointermove", (e) => {
-  if (!isDragging) return;
-  const dx = e.clientX - lastX;
-  const dy = e.clientY - lastY;
-  offsetX += dx;
-  offsetY += dy;
-  lastX = e.clientX;
-  lastY = e.clientY;
-  updateTransform();
-});
+    for (let k = 1; k < 5; k++) {
+      const nx = x - dx * k, ny = y - dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size) break;
+      if (board[nx][ny] === player) count++;
+      else if (board[nx][ny] === "") { open++; break; }
+      else break;
+    }
 
-container.addEventListener("pointerup", () => {
-  isDragging = false;
-  container.style.cursor = "grab";
-});
+    if (count >= 5) score += 100000;
+    else if (count === 4 && open === 2) score += 10000;
+    else if (count === 4 && open === 1) score += 2000;
+    else if (count === 3 && open === 2) score += 1000;
+    else if (count === 3 && open === 1) score += 200;
+    else if (count === 2 && open === 2) score += 100;
+    else score += count * 10;
+  }
 
-container.addEventListener("wheel", (e) => {
-  e.preventDefault();
-  if (e.ctrlKey) rotation += e.deltaY * 0.02;
-  else scale = Math.min(2.5, Math.max(0.5, scale - e.deltaY * 0.001));
-  updateTransform();
-});
-
-function updateTransform() {
-  boardElement.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation}deg)`;
+  return score;
 }
+
+// --- Kiểm tra thắng ---
+function checkWin(x, y) {
+  const player = board[x][y];
+  const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+
+  for (const [dx, dy] of dirs) {
+    let count = 1;
+    for (let k = 1; k < 5; k++) {
+      const nx = x + dx * k, ny = y + dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size) break;
+      if (board[nx][ny] === player) count++;
+      else break;
+    }
+    for (let k = 1; k < 5; k++) {
+      const nx = x - dx * k, ny = y - dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size) break;
+      if (board[nx][ny] === player) count++;
+      else break;
+    }
+    if (count >= 5) return true;
+  }
+
+  return false;
+}
+
+resetBtn.addEventListener("click", () => location.reload());
