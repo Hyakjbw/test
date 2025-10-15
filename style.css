@@ -3,6 +3,9 @@ body {
   color: #fff;
   font-family: "Poppins", sans-serif;
   text-align: center;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 h1 {
@@ -12,20 +15,24 @@ h1 {
 }
 
 #board-container {
-  overflow: auto;
-  touch-action: pinch-zoom;
-  margin: 0 auto;
-  width: 95vw;
-  max-width: 800px;
+  width: 90vw;               /* chừa 5% mỗi bên màn hình */
+  max-width: 800px;          /* không vượt quá 800px để dễ zoom */
+  height: 70vh;              /* chiếm khoảng 70% chiều cao màn hình */
+  overflow: auto;            /* cho phép kéo / zoom */
+  margin: 0 auto;            /* canh giữa */
+  padding: 10px;
   border: 2px solid #333;
   border-radius: 8px;
   background: #1a1a1a;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  touch-action: pinch-zoom;  /* hỗ trợ zoom cảm ứng */
 }
 
 #board {
   display: grid;
   grid-template-columns: repeat(50, 28px);
   justify-content: center;
+  align-content: center;
   margin: 0 auto;
   gap: 1px;
   transform-origin: center center;
@@ -39,6 +46,7 @@ h1 {
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
+  user-select: none;
 }
 
 .cell:hover {
@@ -77,4 +85,5 @@ footer {
   margin-top: 20px;
   color: #888;
   font-size: 14px;
+  padding-bottom: 10px;
 }
