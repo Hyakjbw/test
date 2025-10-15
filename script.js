@@ -1,199 +1,161 @@
 const size = 50;
-const winLen = 5;
-let board = Array.from({ length: size }, () => Array(size).fill(''));
+let board = [];
+let currentPlayer = "X";
 let gameOver = false;
+let offsetX = 0, offsetY = 0, scale = 1, rotation = 0;
+let isDragging = false, lastX, lastY;
 
-const boardDiv = document.getElementById("board");
-const statusDiv = document.getElementById("status");
+const boardElement = document.getElementById("board");
+const statusText = document.getElementById("status");
+const resetBtn = document.getElementById("reset");
 
-// 🎯 Vẽ bàn
-function renderBoard() {
-  boardDiv.innerHTML = "";
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      cell.textContent = board[i][j];
-      if (board[i][j] === "X") cell.classList.add("x");
-      if (board[i][j] === "O") cell.classList.add("o");
-      cell.onclick = () => playerMove(i, j);
-      boardDiv.appendChild(cell);
-    }
+for (let i = 0; i < size; i++) {
+  board[i] = [];
+  for (let j = 0; j < size; j++) {
+    board[i][j] = "";
+    const cell = document.createElement("div");
+    cell.classList.add("cell");
+    cell.addEventListener("click", () => handleClick(i, j, cell));
+    boardElement.appendChild(cell);
   }
 }
-renderBoard();
 
-// 🧍 Người chơi
-function playerMove(i, j) {
+function handleClick(i, j, cell) {
   if (gameOver || board[i][j] !== "") return;
-  board[i][j] = "X";
-  renderBoard();
-  if (checkWin("X")) {
-    statusDiv.textContent = "🎉 Bạn thắng rồi! AI bị hạ gục 😅";
+  board[i][j] = currentPlayer;
+  cell.textContent = currentPlayer;
+  cell.classList.add(currentPlayer.toLowerCase());
+
+  if (checkWin(i, j)) {
+    statusText.textContent = `🎉 Người chơi (${currentPlayer}) thắng!`;
     gameOver = true;
     return;
   }
-  statusDiv.textContent = "AI đang suy nghĩ...";
-  setTimeout(aiMove, 300);
+
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  if (currentPlayer === "O") aiMove();
 }
 
-// 🤖 AI nâng cấp thông minh
 function aiMove() {
-  if (gameOver) return;
-  const [x, y] = findBestMove();
-  board[x][y] = "O";
-  renderBoard();
-  if (checkWin("O")) {
-    statusDiv.textContent = "🤖 AI thắng! Trí tuệ nhân tạo tối thượng!";
-    gameOver = true;
-    return;
-  }
-  statusDiv.textContent = "Lượt của bạn (X)";
-}
-
-// 🧠 AI logic
-function findBestMove() {
   let bestScore = -Infinity;
   let move = null;
 
-  const activeCells = getActiveCells(3);
-  // Kiểm tra nếu có nước thắng hoặc chặn thắng
-  for (let [i, j] of activeCells) {
-    if (board[i][j] !== "") continue;
-    board[i][j] = "O";
-    if (checkWin("O")) {
-      board[i][j] = "";
-      return [i, j];
-    }
-    board[i][j] = "";
-  }
-
-  for (let [i, j] of activeCells) {
-    if (board[i][j] !== "") continue;
-    board[i][j] = "X";
-    if (checkWin("X")) {
-      board[i][j] = "";
-      return [i, j]; // Chặn thắng ngay
-    }
-    board[i][j] = "";
-  }
-
-  // Nếu không có nước thắng ngay → đánh chiến thuật
-  for (let [i, j] of activeCells) {
-    if (board[i][j] === "") {
-      board[i][j] = "O";
-      const score = evaluate(i, j, "O") + Math.random() * 5;
-      board[i][j] = "";
-      if (score > bestScore) {
-        bestScore = score;
-        move = [i, j];
-      }
-    }
-  }
-
-  return move || [Math.floor(size / 2), Math.floor(size / 2)];
-}
-
-// 🔍 Chỉ xem vùng quanh các nước đã đánh
-function getActiveCells(radius) {
-  const cells = new Set();
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
-      if (board[i][j] !== "") {
-        for (let dx = -radius; dx <= radius; dx++) {
-          for (let dy = -radius; dy <= radius; dy++) {
-            let nx = i + dx,
-              ny = j + dy;
-            if (nx >= 0 && ny >= 0 && nx < size && ny < size) {
-              cells.add(nx + "," + ny);
-            }
-          }
+      if (board[i][j] === "") {
+        board[i][j] = "O";
+        let score = evaluate(i, j, "O");
+        board[i][j] = "";
+        if (score > bestScore) {
+          bestScore = score;
+          move = [i, j];
         }
       }
     }
   }
-  return [...cells].map((s) => s.split(",").map(Number));
+
+  if (move) {
+    const idx = move[0] * size + move[1];
+    const cell = boardElement.children[idx];
+    board[move[0]][move[1]] = "O";
+    cell.textContent = "O";
+    cell.classList.add("o");
+
+    if (checkWin(move[0], move[1])) {
+      statusText.textContent = "🤖 AI thắng rồi!";
+      gameOver = true;
+    } else currentPlayer = "X";
+  }
 }
 
-// ⚖️ Đánh giá vị trí
 function evaluate(x, y, player) {
-  let total = 0;
-  const opponent = player === "O" ? "X" : "O";
+  let score = 0;
   const dirs = [
     [1, 0],
     [0, 1],
     [1, 1],
     [1, -1],
   ];
-  for (let [dx, dy] of dirs) total += scoreLine(x, y, dx, dy, player, opponent);
-  return total;
+
+  for (const [dx, dy] of dirs) {
+    let count = 1;
+
+    for (let k = 1; k < 5; k++) {
+      const nx = x + dx * k, ny = y + dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
+      count++;
+    }
+    for (let k = 1; k < 5; k++) {
+      const nx = x - dx * k, ny = y - dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
+      count++;
+    }
+    score = Math.max(score, count);
+  }
+  return score;
 }
 
-// 🔢 Tính điểm tấn công / phòng thủ
-function scoreLine(x, y, dx, dy, me, enemy) {
-  let countMe = 0,
-    countEnemy = 0,
-    openEnds = 0;
+function checkWin(x, y) {
+  const player = board[x][y];
+  const dirs = [
+    [1, 0],
+    [0, 1],
+    [1, 1],
+    [1, -1],
+  ];
 
-  for (let dir = -1; dir <= 1; dir += 2) {
-    let step = 1;
-    while (true) {
-      let nx = x + dx * step * dir,
-        ny = y + dy * step * dir;
-      if (nx < 0 || ny < 0 || nx >= size || ny >= size) break;
-      if (board[nx][ny] === me) countMe++;
-      else if (board[nx][ny] === "") {
-        openEnds++;
-        break;
-      } else break;
-      step++;
+  for (const [dx, dy] of dirs) {
+    let count = 1;
+    for (let k = 1; k < 5; k++) {
+      const nx = x + dx * k, ny = y + dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
+      count++;
     }
-  }
-
-  let myScore = [0, 10, 80, 800, 8000, 99999][countMe] || 0;
-  if (openEnds === 2) myScore *= 2;
-
-  // Phòng thủ
-  for (let dir = -1; dir <= 1; dir += 2) {
-    let step = 1;
-    while (true) {
-      let nx = x + dx * step * dir,
-        ny = y + dy * step * dir;
-      if (nx < 0 || ny < 0 || nx >= size || ny >= size) break;
-      if (board[nx][ny] === enemy) countEnemy++;
-      else if (board[nx][ny] === "") break;
-      else break;
-      step++;
+    for (let k = 1; k < 5; k++) {
+      const nx = x - dx * k, ny = y - dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
+      count++;
     }
-  }
-  let defScore = [0, 10, 100, 900, 9000, 100000][countEnemy] || 0;
-  return myScore + defScore;
-}
-
-// 🏆 Kiểm tra thắng
-function checkWin(p) {
-  const win = p.repeat(winLen);
-  for (let i = 0; i < size; i++) {
-    if (board[i].join("").includes(win)) return true;
-    if (board.map((r) => r[i]).join("").includes(win)) return true;
-  }
-  for (let x = 0; x <= size - winLen; x++) {
-    for (let y = 0; y <= size - winLen; y++) {
-      let d1 = "",
-        d2 = "";
-      for (let k = 0; k < winLen; k++) {
-        d1 += board[x + k][y + k];
-        d2 += board[x + k][y + winLen - 1 - k];
-      }
-      if (d1 === win || d2 === win) return true;
-    }
+    if (count >= 5) return true;
   }
   return false;
 }
 
-function resetGame() {
-  board = Array.from({ length: size }, () => Array(size).fill(""));
-  gameOver = false;
-  statusDiv.textContent = "Bạn đi trước (X)";
-  renderBoard();
+resetBtn.addEventListener("click", () => location.reload());
+
+// ----- Kéo / zoom / xoay khung -----
+const container = document.getElementById("board-container");
+
+container.addEventListener("pointerdown", (e) => {
+  isDragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  container.style.cursor = "grabbing";
+});
+
+container.addEventListener("pointermove", (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - lastX;
+  const dy = e.clientY - lastY;
+  offsetX += dx;
+  offsetY += dy;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  updateTransform();
+});
+
+container.addEventListener("pointerup", () => {
+  isDragging = false;
+  container.style.cursor = "grab";
+});
+
+container.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  if (e.ctrlKey) rotation += e.deltaY * 0.02;
+  else scale = Math.min(2.5, Math.max(0.5, scale - e.deltaY * 0.001));
+  updateTransform();
+});
+
+function updateTransform() {
+  boardElement.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation}deg)`;
 }
