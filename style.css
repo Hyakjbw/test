@@ -83,3 +83,8 @@ footer {
   font-size: 13px;
   opacity: 0.7;
 }
+.cell.ai-highlight {
+  background-color: rgba(0, 234, 255, 0.25);
+  box-shadow: 0 0 10px #00eaff;
+  transition: background-color 0.5s, box-shadow 0.5s;
+}
