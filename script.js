@@ -15,7 +15,7 @@ for (let i = 0; i < boardSize * boardSize; i++) {
 
 // --- KIỂM TRA THẮNG ---
 function checkWin(x, y, player) {
-  const dirs = [[1, 0], [0, 1], [1, 1], [1, -1]];
+  const dirs = [[1,0],[0,1],[1,1],[1,-1]];
   for (let [dx, dy] of dirs) {
     let count = 1;
     for (let dir of [-1, 1]) {
@@ -34,10 +34,14 @@ function checkWin(x, y, player) {
   return false;
 }
 
-// --- AI thông minh ---
+// --- AI THÔNG MINH KHÔNG XUNG ĐỘT ---
 function aiMove() {
-  let move = findSmartMove();
+  let move = findSmartMove(); // đánh theo chiến thuật
+
+  // nếu không tìm được nước thông minh, mới đánh gần người chơi
   if (!move) move = findNearPlayer();
+
+  // nếu vẫn không có (bàn trống), đánh ngẫu nhiên
   if (!move) move = findAnyMove();
 
   if (move) {
@@ -50,9 +54,11 @@ function aiMove() {
   }
 }
 
-// --- TÌM NƯỚC ĐI TỐT NHẤT ---
+// --- TÌM NƯỚC ĐI THÔNG MINH ---
 function findSmartMove() {
-  // 1. Nếu AI có thể thắng, đánh luôn
+  let bestMove = null;
+
+  // 1️⃣: Nếu AI có thể thắng ngay => Đánh luôn
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize; j++) {
       if (board[i][j] === "") {
@@ -66,7 +72,7 @@ function findSmartMove() {
     }
   }
 
-  // 2. Nếu người chơi sắp thắng, chặn lại
+  // 2️⃣: Nếu người chơi sắp thắng => Chặn lại
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize; j++) {
       if (board[i][j] === "") {
@@ -80,44 +86,67 @@ function findSmartMove() {
     }
   }
 
-  // 3. Nếu không có gì nguy cấp, ưu tiên nước tạo thế mạnh (4 hoặc 3 hàng)
-  let bestScore = -1;
-  let bestMove = null;
-
+  // 3️⃣: Ưu tiên nước có điểm mạnh nhất (đánh để tạo thế)
+  let bestScore = -Infinity;
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize; j++) {
       if (board[i][j] === "") {
-        let score = evaluatePosition(i, j, "O") + evaluatePosition(i, j, "X") * 0.8;
-        if (score > bestScore) {
-          bestScore = score;
+        const scoreO = evaluatePosition(i, j, "O");
+        const scoreX = evaluatePosition(i, j, "X");
+        const total = scoreO + scoreX * 0.9; // hơi ưu tiên chặn
+        if (total > bestScore) {
+          bestScore = total;
           bestMove = { i, j };
         }
       }
     }
   }
+
   return bestMove;
 }
 
-// --- HÀM ĐÁNH GIÁ VỊ TRÍ ---
+// --- ĐÁNH GIÁ VỊ TRÍ (AI CHIẾN LƯỢC) ---
 function evaluatePosition(x, y, player) {
-  const dirs = [[1, 0], [0, 1], [1, 1], [1, -1]];
-  let total = 0;
+  const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+  let score = 0;
+
   for (let [dx, dy] of dirs) {
     let count = 0;
-    for (let dir of [-1, 1]) {
-      let i = 1;
-      while (true) {
-        const nx = x + dx * i * dir;
-        const ny = y + dy * i * dir;
-        if (nx < 0 || ny < 0 || nx >= boardSize || ny >= boardSize || board[nx][ny] !== player)
-          break;
-        count++;
-        i++;
-      }
+    let openEnds = 0;
+
+    // hướng 1
+    let i = 1;
+    while (true) {
+      const nx = x + dx * i;
+      const ny = y + dy * i;
+      if (nx < 0 || ny < 0 || nx >= boardSize || ny >= boardSize) break;
+      if (board[nx][ny] === player) count++;
+      else if (board[nx][ny] === "") { openEnds++; break; }
+      else break;
+      i++;
     }
-    total += Math.pow(2, count); // càng nhiều liên kết càng mạnh
+
+    // hướng 2
+    i = 1;
+    while (true) {
+      const nx = x - dx * i;
+      const ny = y - dy * i;
+      if (nx < 0 || ny < 0 || nx >= boardSize || ny >= boardSize) break;
+      if (board[nx][ny] === player) count++;
+      else if (board[nx][ny] === "") { openEnds++; break; }
+      else break;
+      i++;
+    }
+
+    // chấm điểm
+    if (count >= 4) score += 10000;
+    else if (count === 3 && openEnds === 2) score += 1000;
+    else if (count === 3 && openEnds === 1) score += 200;
+    else if (count === 2 && openEnds === 2) score += 100;
+    else if (count === 2 && openEnds === 1) score += 30;
+    else if (count === 1 && openEnds === 2) score += 10;
   }
-  return total;
+  return score;
 }
 
 // --- ƯU TIÊN ĐÁNH GẦN NGƯỜI CHƠI ---
@@ -125,7 +154,6 @@ function findNearPlayer() {
   const last = getLastPlayerMove();
   if (!last) return null;
   const { x, y } = last;
-
   const range = 2;
   for (let r = 1; r <= range; r++) {
     for (let i = x - r; i <= x + r; i++) {
@@ -167,7 +195,7 @@ function render() {
   });
 }
 
-// --- NGƯỜI CHƠI CLICK ---
+// --- NGƯỜI CHƠI ĐÁNH ---
 document.querySelectorAll(".cell").forEach(cell => {
   cell.addEventListener("click", () => {
     if (gameOver) return;
@@ -187,7 +215,7 @@ document.querySelectorAll(".cell").forEach(cell => {
   });
 });
 
-// --- CHƠI LẠI ---
+// --- NÚT CHƠI LẠI ---
 resetBtn.addEventListener("click", () => {
   board = Array(boardSize).fill().map(() => Array(boardSize).fill(""));
   gameOver = false;
