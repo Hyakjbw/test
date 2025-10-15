@@ -46,12 +46,21 @@ function aiMove() {
   if (!move) move = findAnyMove();
 
   if (move) {
-    board[move.i][move.j] = "O";
-    lastAIMove = move; // 👈 Ghi lại ô vừa đánh để làm sáng
-    render();
-    if (checkWin(move.i, move.j, "O")) {
-      statusEl.textContent = "🤖 AI thắng! Không thể chống lại trí tuệ nhân tạo!";
-      gameOver = true;
+  // --- Xóa sáng cũ ---
+  document.querySelectorAll(".ai-highlight").forEach(c => c.classList.remove("ai-highlight"));
+
+  // --- Đánh nước mới ---
+  board[move.i][move.j] = "O";
+  render();
+
+  // --- Sáng ô AI vừa đánh ---
+  const aiIndex = move.i * boardSize + move.j;
+  const aiCell = document.querySelector(`.cell[data-index='${aiIndex}']`);
+  if (aiCell) aiCell.classList.add("ai-highlight");
+
+  if (checkWin(move.i, move.j, "O")) {
+    statusEl.textContent = "🤖 AI thắng! Không thể chống lại trí tuệ nhân tạo!";
+    gameOver = true;
     }
   }
 }
