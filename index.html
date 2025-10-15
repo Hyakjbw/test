@@ -3,160 +3,168 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cờ Ca Rô 5 Ô 🎲</title>
+<title>Cờ Ca Rô AI Thông Minh 🤖</title>
 <style>
   body {
-    background: #fce4ec;
+    background: #fff0f6;
     font-family: "Poppins", sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
   }
-
   h1 {
     color: #e91e63;
-    margin-bottom: 10px;
   }
-
   #board {
     display: grid;
     grid-template-columns: repeat(15, 30px);
     grid-template-rows: repeat(15, 30px);
     gap: 2px;
   }
-
   .cell {
     width: 30px;
     height: 30px;
     background: #fff;
     border: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-    transition: background 0.3s;
   }
-
-  .cell:hover {
-    background: #f8bbd0;
-  }
-
   .x { color: #e91e63; }
   .o { color: #3f51b5; }
-
   #status {
-    margin-top: 15px;
-    color: #555;
+    margin-top: 10px;
     font-size: 18px;
+    color: #333;
   }
-
   button {
     margin-top: 10px;
-    padding: 8px 16px;
     background: #e91e63;
     color: #fff;
     border: none;
+    padding: 8px 16px;
     border-radius: 5px;
-    font-size: 16px;
+    cursor: pointer;
   }
 </style>
 </head>
 <body>
-  <h1>Cờ Ca Rô 5 Ô</h1>
-  <div id="board"></div>
-  <div id="status">Lượt của bạn (X)</div>
-  <button onclick="resetGame()">Chơi lại</button>
+<h1>Cờ Ca Rô AI 🤖</h1>
+<div id="board"></div>
+<div id="status">Lượt của bạn (X)</div>
+<button onclick="resetGame()">Chơi lại</button>
 
 <script>
 const size = 15;
-const board = Array(size).fill().map(() => Array(size).fill(""));
+let board = Array(size).fill().map(()=>Array(size).fill(""));
 let gameOver = false;
 const boardDiv = document.getElementById("board");
 const statusDiv = document.getElementById("status");
 
-function renderBoard() {
-  boardDiv.innerHTML = "";
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      const cell = document.createElement("div");
-      cell.classList.add("cell");
-      if (board[i][j] === "X") cell.classList.add("x");
-      if (board[i][j] === "O") cell.classList.add("o");
-      cell.textContent = board[i][j];
-      cell.addEventListener("click", () => playerMove(i, j));
-      boardDiv.appendChild(cell);
+function renderBoard(){
+  boardDiv.innerHTML="";
+  for(let i=0;i<size;i++){
+    for(let j=0;j<size;j++){
+      const c=document.createElement("div");
+      c.className="cell";
+      c.textContent=board[i][j];
+      if(board[i][j]==="X")c.classList.add("x");
+      if(board[i][j]==="O")c.classList.add("o");
+      c.addEventListener("click",()=>playerMove(i,j));
+      boardDiv.appendChild(c);
     }
   }
 }
 
-function playerMove(i, j) {
-  if (board[i][j] || gameOver) return;
-  board[i][j] = "X";
+function playerMove(i,j){
+  if(board[i][j]||gameOver)return;
+  board[i][j]="X";
   renderBoard();
-  if (checkWin("X")) {
-    statusDiv.textContent = "Bạn thắng! 🎉";
-    gameOver = true;
-    return;
-  }
-  statusDiv.textContent = "Máy đang suy nghĩ...";
-  setTimeout(aiMove, 400);
+  if(checkWin("X")){statusDiv.textContent="Bạn thắng 🎉";gameOver=true;return;}
+  statusDiv.textContent="Máy đang suy nghĩ...";
+  setTimeout(aiMove,300);
 }
 
-function aiMove() {
-  if (gameOver) return;
-  let emptyCells = [];
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      if (!board[i][j]) emptyCells.push([i, j]);
+function aiMove(){
+  if(gameOver)return;
+  let bestScore=-Infinity;
+  let move=null;
+  for(let i=0;i<size;i++){
+    for(let j=0;j<size;j++){
+      if(board[i][j]===""){
+        board[i][j]="O";
+        let score=evaluateBoard("O") - evaluateBoard("X")*0.8;
+        if(score>bestScore){bestScore=score;move=[i,j];}
+        board[i][j]="";
+      }
     }
   }
-  if (emptyCells.length === 0) {
-    statusDiv.textContent = "Hòa!";
-    gameOver = true;
-    return;
+  if(move){
+    board[move[0]][move[1]]="O";
   }
-  // Máy chọn ô ngẫu nhiên gần ô người chơi
-  let [i, j] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-  board[i][j] = "O";
   renderBoard();
-  if (checkWin("O")) {
-    statusDiv.textContent = "Máy thắng 😎";
-    gameOver = true;
-    return;
-  }
-  statusDiv.textContent = "Lượt của bạn (X)";
+  if(checkWin("O")){statusDiv.textContent="Máy thắng 😎";gameOver=true;return;}
+  statusDiv.textContent="Lượt của bạn (X)";
 }
 
-function checkWin(symbol) {
-  const directions = [
-    [1, 0], [0, 1], [1, 1], [1, -1]
-  ];
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      if (board[i][j] !== symbol) continue;
-      for (const [dx, dy] of directions) {
-        let count = 1;
-        for (let k = 1; k < 5; k++) {
-          const x = i + dx * k, y = j + dy * k;
-          if (x < 0 || y < 0 || x >= size || y >= size || board[x][y] !== symbol)
-            break;
+function evaluateBoard(symbol){
+  let score=0;
+  const dirs=[[1,0],[0,1],[1,1],[1,-1]];
+  for(let i=0;i<size;i++){
+    for(let j=0;j<size;j++){
+      if(board[i][j]!==symbol)continue;
+      for(const [dx,dy] of dirs){
+        let count=1,open1=false,open2=false;
+        let x=i-dx,y=j-dy;
+        if(inBoard(x,y)&&board[x][y]==="")open1=true;
+        for(let k=1;k<5;k++){
+          x=i+dx*k;y=j+dy*k;
+          if(!inBoard(x,y)||board[x][y]!==symbol)break;
           count++;
         }
-        if (count >= 5) return true;
+        if(inBoard(x,y)&&board[x][y]==="")open2=true;
+        if(count>=5)score+=100000;
+        else if(count===4&&open1&&open2)score+=10000;
+        else if(count===4&&(open1||open2))score+=5000;
+        else if(count===3&&open1&&open2)score+=1000;
+        else if(count===2&&open1&&open2)score+=200;
+        else if(count===1&&open1&&open2)score+=50;
+      }
+    }
+  }
+  return score;
+}
+
+function inBoard(x,y){return x>=0&&y>=0&&x<size&&y<size;}
+
+function checkWin(symbol){
+  const dirs=[[1,0],[0,1],[1,1],[1,-1]];
+  for(let i=0;i<size;i++){
+    for(let j=0;j<size;j++){
+      if(board[i][j]!==symbol)continue;
+      for(const[dx,dy]of dirs){
+        let count=1;
+        for(let k=1;k<5;k++){
+          const x=i+dx*k,y=j+dy*k;
+          if(!inBoard(x,y)||board[x][y]!==symbol)break;
+          count++;
+        }
+        if(count>=5)return true;
       }
     }
   }
   return false;
 }
 
-function resetGame() {
-  for (let i = 0; i < size; i++) board[i].fill("");
-  gameOver = false;
-  statusDiv.textContent = "Lượt của bạn (X)";
+function resetGame(){
+  board=Array(size).fill().map(()=>Array(size).fill(""));
+  gameOver=false;
+  statusDiv.textContent="Lượt của bạn (X)";
   renderBoard();
 }
 
