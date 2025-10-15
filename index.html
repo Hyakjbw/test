@@ -3,172 +3,266 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cờ Ca Rô AI Thông Minh 🤖</title>
+<title>Cờ Caro Siêu Cấp Meme AI</title>
 <style>
   body {
-    background: #fff0f6;
-    font-family: "Poppins", sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    margin: 0;
+    background-color: #181818;
+    color: #fff;
+    font-family: 'Comic Sans MS', cursive;
+    text-align: center;
   }
+
   h1 {
-    color: #e91e63;
+    color: #00ffcc;
+    text-shadow: 0 0 10px #00ffff;
   }
+
   #board {
     display: grid;
-    grid-template-columns: repeat(15, 30px);
-    grid-template-rows: repeat(15, 30px);
-    gap: 2px;
-  }
-  .cell {
-    width: 30px;
-    height: 30px;
-    background: #fff;
-    border: 1px solid #ccc;
-    font-size: 20px;
-    display: flex;
+    grid-template-columns: repeat(10, 50px);
+    gap: 3px;
     justify-content: center;
-    align-items: center;
-    cursor: pointer;
+    margin: 30px auto;
   }
-  .x { color: #e91e63; }
-  .o { color: #3f51b5; }
+
+  .cell {
+    width: 50px;
+    height: 50px;
+    background-color: #222;
+    border: 1px solid #444;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+  }
+
+  .cell:hover {
+    background-color: #333;
+  }
+
   #status {
-    margin-top: 10px;
-    font-size: 18px;
-    color: #333;
+    margin-top: 20px;
+    font-size: 20px;
+    color: #ffcc00;
   }
+
+  #chat {
+    margin-top: 20px;
+    background: #111;
+    padding: 10px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    height: 100px;
+    overflow-y: auto;
+    text-align: left;
+  }
+
+  .ai-message {
+    color: #00ff00;
+    margin: 5px 0;
+  }
+
+  .player-message {
+    color: #ff6666;
+    margin: 5px 0;
+  }
+
   button {
-    margin-top: 10px;
-    background: #e91e63;
-    color: #fff;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #00ffcc;
     border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    color: #000;
+    font-weight: bold;
+  }
+
+  button:hover {
+    background: #00ffaa;
   }
 </style>
 </head>
 <body>
-<h1>Cờ Ca Rô AI 🤖</h1>
+<h1>🤖 Cờ Caro Meme AI – Trí Tuệ Huyền Thoại 🤖</h1>
+
 <div id="board"></div>
-<div id="status">Lượt của bạn (X)</div>
+<div id="status">Bạn đi trước (X)</div>
+<div id="chat"></div>
+
 <button onclick="resetGame()">Chơi lại</button>
 
 <script>
-const size = 15;
-let board = Array(size).fill().map(()=>Array(size).fill(""));
+const boardSize = 10;
+const winLength = 5;
+let board = Array.from({length: boardSize}, () => Array(boardSize).fill(''));
 let gameOver = false;
-const boardDiv = document.getElementById("board");
-const statusDiv = document.getElementById("status");
 
-function renderBoard(){
-  boardDiv.innerHTML="";
-  for(let i=0;i<size;i++){
-    for(let j=0;j<size;j++){
-      const c=document.createElement("div");
-      c.className="cell";
-      c.textContent=board[i][j];
-      if(board[i][j]==="X")c.classList.add("x");
-      if(board[i][j]==="O")c.classList.add("o");
-      c.addEventListener("click",()=>playerMove(i,j));
-      boardDiv.appendChild(c);
+const boardDiv = document.getElementById('board');
+const statusDiv = document.getElementById('status');
+const chatDiv = document.getElementById('chat');
+
+// tạo bảng
+function renderBoard() {
+  boardDiv.innerHTML = '';
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = board[i][j];
+      cell.onclick = () => playerMove(i, j);
+      boardDiv.appendChild(cell);
     }
   }
 }
+renderBoard();
 
-function playerMove(i,j){
-  if(board[i][j]||gameOver)return;
-  board[i][j]="X";
-  renderBoard();
-  if(checkWin("X")){statusDiv.textContent="Bạn thắng 🎉";gameOver=true;return;}
-  statusDiv.textContent="Máy đang suy nghĩ...";
-  setTimeout(aiMove,300);
+// AI nói chuyện
+function aiChat(text) {
+  const msg = document.createElement('div');
+  msg.className = 'ai-message';
+  msg.textContent = "🤖 " + text;
+  chatDiv.appendChild(msg);
+  chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
-function aiMove(){
-  if(gameOver)return;
-  let bestScore=-Infinity;
-  let move=null;
-  for(let i=0;i<size;i++){
-    for(let j=0;j<size;j++){
-      if(board[i][j]===""){
-        board[i][j]="O";
-        let score=evaluateBoard("O") - evaluateBoard("X")*0.8;
-        if(score>bestScore){bestScore=score;move=[i,j];}
-        board[i][j]="";
-      }
-    }
-  }
-  if(move){
-    board[move[0]][move[1]]="O";
-  }
-  renderBoard();
-  if(checkWin("O")){statusDiv.textContent="Máy thắng 😎";gameOver=true;return;}
-  statusDiv.textContent="Lượt của bạn (X)";
+// Người chơi nói
+function playerChat(text) {
+  const msg = document.createElement('div');
+  msg.className = 'player-message';
+  msg.textContent = "🧑 " + text;
+  chatDiv.appendChild(msg);
+  chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
-function evaluateBoard(symbol){
-  let score=0;
-  const dirs=[[1,0],[0,1],[1,1],[1,-1]];
-  for(let i=0;i<size;i++){
-    for(let j=0;j<size;j++){
-      if(board[i][j]!==symbol)continue;
-      for(const [dx,dy] of dirs){
-        let count=1,open1=false,open2=false;
-        let x=i-dx,y=j-dy;
-        if(inBoard(x,y)&&board[x][y]==="")open1=true;
-        for(let k=1;k<5;k++){
-          x=i+dx*k;y=j+dy*k;
-          if(!inBoard(x,y)||board[x][y]!==symbol)break;
-          count++;
+function playerMove(x, y) {
+  if (gameOver || board[x][y]) return;
+  board[x][y] = 'X';
+  renderBoard();
+
+  if (checkWin('X')) {
+    statusDiv.textContent = "🎉 Bạn thắng rồi! Nhưng AI đang học hỏi... 😤";
+    aiChat("Không thể nào... ta sẽ trở lại mạnh mẽ hơn!");
+    gameOver = true;
+    return;
+  }
+
+  statusDiv.textContent = "AI đang suy nghĩ...";
+  setTimeout(aiMove, 700);
+}
+
+function aiMove() {
+  if (gameOver) return;
+
+  let move = bestMove();
+  let [x, y] = move;
+  board[x][y] = 'O';
+
+  renderBoard();
+  aiChat(["Dễ thôi 😎", "Ta đang kiểm soát trận đấu!", "Lá bài đặc biệt: Đánh 2 lần!"][Math.floor(Math.random()*3)]);
+
+  // có 10% cơ hội AI đánh 2 lần
+  if (Math.random() < 0.1) {
+    aiChat("💥 AI đã kích hoạt 'Lá bài đánh 2 lần' 💥");
+    let move2 = bestMove();
+    if (move2) board[move2[0]][move2[1]] = 'O';
+    renderBoard();
+  }
+
+  if (checkWin('O')) {
+    statusDiv.textContent = "💀 AI thắng rồi! Không ai cản nổi 🤖";
+    aiChat("Hehehe, con người yếu đuối quá...");
+    gameOver = true;
+    return;
+  }
+
+  statusDiv.textContent = "Lượt của bạn!";
+}
+
+// tìm nước đi tốt nhất (AI có chiến thuật)
+function bestMove() {
+  let bestScore = -Infinity;
+  let move;
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      if (board[i][j] === '') {
+        board[i][j] = 'O';
+        let score = evaluateBoard();
+        board[i][j] = '';
+        if (score > bestScore) {
+          bestScore = score;
+          move = [i, j];
         }
-        if(inBoard(x,y)&&board[x][y]==="")open2=true;
-        if(count>=5)score+=100000;
-        else if(count===4&&open1&&open2)score+=10000;
-        else if(count===4&&(open1||open2))score+=5000;
-        else if(count===3&&open1&&open2)score+=1000;
-        else if(count===2&&open1&&open2)score+=200;
-        else if(count===1&&open1&&open2)score+=50;
       }
     }
   }
+  // nếu không tìm được thì random
+  return move || [Math.floor(Math.random()*boardSize), Math.floor(Math.random()*boardSize)];
+}
+
+// chấm điểm cho bàn cờ
+function evaluateBoard() {
+  let score = 0;
+  // cộng điểm cho chuỗi O, trừ điểm cho chuỗi X
+  const patterns = [
+    [/OOOO/, 10000],
+    [/OOO/, 1000],
+    [/OO/, 100],
+    [/X/, -50],
+  ];
+  const lines = [];
+
+  for (let i=0;i<boardSize;i++) {
+    lines.push(board[i].join(''));
+    lines.push(board.map(r=>r[i]).join(''));
+  }
+
+  for (let k=0;k<boardSize;k++){
+    let d1='', d2='';
+    for (let i=0;i<boardSize-k;i++){
+      d1 += board[i][i+k] || '';
+      d2 += board[i+k][i] || '';
+    }
+    lines.push(d1,d2);
+  }
+
+  lines.forEach(line=>{
+    patterns.forEach(([pat,val])=>{
+      if (pat.test(line)) score += val;
+    });
+  });
+
   return score;
 }
 
-function inBoard(x,y){return x>=0&&y>=0&&x<size&&y<size;}
-
-function checkWin(symbol){
-  const dirs=[[1,0],[0,1],[1,1],[1,-1]];
-  for(let i=0;i<size;i++){
-    for(let j=0;j<size;j++){
-      if(board[i][j]!==symbol)continue;
-      for(const[dx,dy]of dirs){
-        let count=1;
-        for(let k=1;k<5;k++){
-          const x=i+dx*k,y=j+dy*k;
-          if(!inBoard(x,y)||board[x][y]!==symbol)break;
-          count++;
-        }
-        if(count>=5)return true;
+// kiểm tra thắng
+function checkWin(player) {
+  const win = player.repeat(winLength);
+  for (let i=0;i<boardSize;i++){
+    if (board[i].join('').includes(win)) return true;
+    if (board.map(r=>r[i]).join('').includes(win)) return true;
+  }
+  for (let x=0;x<boardSize-winLength;x++){
+    for (let y=0;y<boardSize-winLength;y++){
+      let d1='', d2='';
+      for (let k=0;k<winLength;k++){
+        d1 += board[x+k][y+k];
+        d2 += board[x+k][y+winLength-1-k];
       }
+      if (d1===win || d2===win) return true;
     }
   }
   return false;
 }
 
-function resetGame(){
-  board=Array(size).fill().map(()=>Array(size).fill(""));
-  gameOver=false;
-  statusDiv.textContent="Lượt của bạn (X)";
+function resetGame() {
+  board = Array.from({length: boardSize}, () => Array(boardSize).fill(''));
+  gameOver = false;
+  statusDiv.textContent = "Bạn đi trước (X)";
+  chatDiv.innerHTML = '';
   renderBoard();
 }
-
-renderBoard();
 </script>
 </body>
 </html>
