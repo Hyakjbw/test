@@ -2,15 +2,14 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cờ Caro AI 99%</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Cờ Caro AI 99% Fix</title>
 <style>
   body {
     background: #121212;
     color: #fff;
     font-family: "Poppins", sans-serif;
     text-align: center;
-    overflow: hidden;
   }
 
   h1 {
@@ -19,12 +18,24 @@
     margin-top: 15px;
   }
 
+  #board-container {
+    overflow: auto;
+    touch-action: pinch-zoom;
+    margin: 0 auto;
+    width: 95vw;
+    max-width: 720px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background: #1a1a1a;
+  }
+
   #board {
     display: grid;
-    grid-template-columns: repeat(15, 36px);
+    grid-template-columns: repeat(19, 36px);
     justify-content: center;
-    margin: 25px auto;
+    margin: 0 auto;
     gap: 1px;
+    transform-origin: center center;
   }
 
   .cell {
@@ -77,14 +88,16 @@
 </style>
 </head>
 <body>
-<h1>CỜ CARO AI THÔNG MINH 99%</h1>
-<div id="board"></div>
+<h1>CỜ CARO AI 99% 🤖</h1>
+<div id="board-container">
+  <div id="board"></div>
+</div>
 <div id="status">Lượt của bạn (X)</div>
 <button onclick="resetGame()">Chơi lại</button>
 <footer>Cre: Nguyễn Hải Huy 💙</footer>
 
 <script>
-const size = 15;
+const size = 19;
 const winLen = 5;
 let board = Array.from({length: size}, () => Array(size).fill(''));
 let gameOver = false;
@@ -113,7 +126,7 @@ function playerMove(i,j){
   board[i][j]="X";
   renderBoard();
   if (checkWin("X")){
-    statusDiv.textContent = "🎉 Bạn thắng rồi! AI thất bại hiếm hoi 😅";
+    statusDiv.textContent = "🎉 Bạn thắng rồi! AI bị hạ gục 😅";
     gameOver = true;
     return;
   }
@@ -127,32 +140,52 @@ function aiMove(){
   board[x][y] = "O";
   renderBoard();
   if (checkWin("O")){
-    statusDiv.textContent = "🤖 AI thắng! Trí tuệ nhân tạo đỉnh cao!";
+    statusDiv.textContent = "🤖 AI thắng! Trí tuệ nhân tạo tối thượng!";
     gameOver = true;
     return;
   }
   statusDiv.textContent = "Lượt của bạn (X)";
 }
 
-// === AI THÔNG MINH ===
 function findBestMove(){
   let bestScore = -Infinity;
-  let move = [7,7]; // mặc định trung tâm
+  let move = null;
 
+  const activeCells = getActiveCells(3); // chỉ xét vùng quanh các quân
+
+  for (let [i,j] of activeCells){
+    if (board[i][j]===""){
+      board[i][j] = "O";
+      const score = evaluate(i,j,"O") + Math.random()*10;
+      board[i][j] = "";
+      if (score > bestScore){
+        bestScore = score;
+        move = [i,j];
+      }
+    }
+  }
+  // nếu bàn trống -> trung tâm
+  return move || [Math.floor(size/2), Math.floor(size/2)];
+}
+
+// chỉ xem vùng quanh các quân cờ có sẵn
+function getActiveCells(radius){
+  const cells = new Set();
   for (let i=0;i<size;i++){
     for (let j=0;j<size;j++){
-      if (board[i][j]===""){
-        board[i][j] = "O";
-        const score = evaluate(i,j,"O") + Math.random()*10;
-        board[i][j] = "";
-        if (score > bestScore){
-          bestScore = score;
-          move = [i,j];
+      if (board[i][j]!==""){
+        for (let dx=-radius; dx<=radius; dx++){
+          for (let dy=-radius; dy<=radius; dy++){
+            let nx=i+dx, ny=j+dy;
+            if (nx>=0 && ny>=0 && nx<size && ny<size){
+              cells.add(nx+","+ny);
+            }
+          }
         }
       }
     }
   }
-  return move;
+  return [...cells].map(s=>s.split(",").map(Number));
 }
 
 function evaluate(x,y,player){
@@ -167,7 +200,7 @@ function evaluate(x,y,player){
 
 function scoreLine(x,y,dx,dy,me,enemy){
   let countMe=0, countEnemy=0, openEnds=0;
-  // đếm 1 hướng
+
   for (let dir=-1;dir<=1;dir+=2){
     let step=1;
     while(true){
@@ -179,11 +212,10 @@ function scoreLine(x,y,dx,dy,me,enemy){
       step++;
     }
   }
-  // điểm cho chuỗi của mình
+
   let myScore = [0,10,80,800,8000,99999][countMe] || 0;
   if (openEnds===2) myScore *= 2;
 
-  // chặn người chơi
   for (let dir=-1;dir<=1;dir+=2){
     let step=1;
     while(true){
@@ -199,7 +231,6 @@ function scoreLine(x,y,dx,dy,me,enemy){
   return myScore + defScore;
 }
 
-// === Kiểm tra thắng ===
 function checkWin(p){
   const win = p.repeat(winLen);
   for (let i=0;i<size;i++){
