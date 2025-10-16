@@ -1,6 +1,6 @@
 // 🎵 Danh sách nhạc
 const musicList = [
-  { title: "trình", src: "music/lose.mp3" },
+  { title: "trình", src: "lose.mp3" },
   { title: "Nơi Này Có Anh - Sơn Tùng MTP", src: "music/noinaicoanh.mp3" },
 ];
 
