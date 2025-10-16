@@ -5,7 +5,7 @@ const musicListData = [
 ];
 
 const videoListData = [
-  { title: "MV Em Của Ngày Hôm Qua", file: "emcuangayhomqua.mp4", thumb: "video.jpg" },
+  { title: "MV Em Của Ngày Hôm Qua", file: "emcuangayhomqua.mp4", thumb: "video.jpeg" },
   { title: "Spirited Away Trailer", file: "spiritedaway.mp4", thumb: "video2.jpg" }
 ];
 
