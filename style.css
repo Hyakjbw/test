@@ -1,100 +1,90 @@
 body {
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  color: white;
-  font-family: 'Segoe UI', sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  height: 100vh;
-  margin: 0;
-  overflow-y: scroll;
-}
-
-.container {
+  background: #0f0f0f;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
   text-align: center;
-  margin-top: 20px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Giữ toàn màn hình */
 }
 
 h1 {
-  margin-bottom: 15px;
-  text-shadow: 0 0 10px #00eaff;
+  color: #00eaff;
+  text-shadow: 0 0 10px #00ffff;
+  margin-top: 10px;
 }
 
-.game-area {
-  width: 90vmin;
-  height: 90vmin;
-  max-width: 800px;
-  max-height: 800px;
-  border: 3px solid #00eaff;
+#game-window {
+  width: 90vw;
+  height: 70vh;
+  margin: 20px auto;
+  border: 2px solid #00eaff;
   border-radius: 10px;
-  overflow: auto;
-  background-color: #111;
-  margin: auto;
+  overflow: hidden;
+  position: relative;
+  background: radial-gradient(circle at center, #1a1a1a 70%, #000);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+}
+
+#board-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
 }
 
 #board {
   display: grid;
-  grid-template-columns: repeat(20, 40px);
-  grid-template-rows: repeat(20, 40px);
-  width: 800px;
-  height: 800px;
+  grid-template-columns: repeat(50, 28px);
+  grid-template-rows: repeat(50, 28px);
+  gap: 1px;
+  transform: translate(0px, 0px) scale(1) rotate(0deg);
+  transition: transform 0.05s ease-out;
+  transform-origin: center center;
 }
 
 .cell {
+  width: 28px;
+  height: 28px;
+  background: #1e1e1e;
   border: 1px solid #333;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
+  user-select: none;
 }
 
-.cell.x {
+.x {
   color: #ff4f6d;
-  text-shadow: 0 0 6px #ff4f6d;
 }
 
-.cell.o {
+.o {
   color: #00eaff;
-  text-shadow: 0 0 6px #00eaff;
 }
 
-.controls {
+#status {
+  font-size: 18px;
   margin-top: 10px;
 }
 
 button {
-  background: #00eaff;
-  border: none;
+  margin-top: 10px;
   padding: 10px 20px;
+  background: #00eaff;
+  color: #000;
+  border: none;
   border-radius: 6px;
-  cursor: pointer;
   font-weight: bold;
-  transition: 0.3s;
+  cursor: pointer;
 }
 
 button:hover {
-  background: #009ecf;
+  background: #00ffaa;
 }
 
 footer {
   margin-top: 15px;
-  font-size: 13px;
-  opacity: 0.7;
-}
-.cell.ai-highlight {
-  background-color: rgba(0, 234, 255, 0.25);
-  box-shadow: 0 0 10px #00eaff;
-  transition: background-color 0.5s, box-shadow 0.5s;
-}
-.cell.hint {
-  background-color: rgba(255, 255, 100, 0.3);
-  box-shadow: 0 0 10px yellow;
-  animation: hintBlink 1s infinite alternate;
-}
-
-@keyframes hintBlink {
-  from { box-shadow: 0 0 5px yellow; }
-  to { box-shadow: 0 0 15px yellow; }
+  color: #888;
+  font-size: 14px;
 }
