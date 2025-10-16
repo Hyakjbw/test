@@ -3,34 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MediaHub - Nghe nhạc & Xem phim</title>
+  <title>Blue Media Hub</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>🎧 MediaHub 🎬</h1>
+    <h1>🎧 Blue Media Hub</h1>
     <nav>
-      <button id="musicTab" class="active">Nghe nhạc</button>
-      <button id="movieTab">Xem phim</button>
+      <button id="musicTab" class="active">Nhạc</button>
+      <button id="videoTab">Video</button>
     </nav>
   </header>
 
   <main>
-    <section id="musicSection" class="tab active">
-      <h2>🎵 Danh sách nhạc</h2>
-      <ul id="musicList"></ul>
+    <!-- MỤC NHẠC -->
+    <section id="musicSection" class="section active">
+      <div id="musicList" class="list"></div>
       <audio id="audioPlayer" controls></audio>
     </section>
 
-    <section id="movieSection" class="tab">
-      <h2>🎬 Danh sách phim</h2>
-      <ul id="movieList"></ul>
+    <!-- MỤC VIDEO -->
+    <section id="videoSection" class="section">
+      <div id="videoList" class="list"></div>
       <video id="videoPlayer" controls></video>
     </section>
   </main>
 
   <footer>
-    <p>© 2025 Nguyễn Hải Huy | MediaHub</p>
+    <p>© 2025 Blue Media Hub – by Nguyễn Hải Huy </p>
   </footer>
 
   <script src="script.js"></script>
