@@ -3,22 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cờ Ca Rô AI 100%</title>
+  <title>MediaHub - Nghe nhạc & Xem phim</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>🤖 CỜ CA RÔ SIÊU DỄ</h1>
-    <div class="game-area">
-      <div id="board"></div>
-    </div>
-    <div class="controls">
-        <p id="status">Người chơi đi trước!</p>
-      <button id="reset">🔁 Chơi lại</button>
-    </div>
-  </div>
+  <header>
+    <h1>🎧 MediaHub 🎬</h1>
+    <nav>
+      <button id="musicTab" class="active">Nghe nhạc</button>
+      <button id="movieTab">Xem phim</button>
+    </nav>
+  </header>
 
-  <footer>© 2025 Nguyễn Hải Huy </footer>
+  <main>
+    <section id="musicSection" class="tab active">
+      <h2>🎵 Danh sách nhạc</h2>
+      <ul id="musicList"></ul>
+      <audio id="audioPlayer" controls></audio>
+    </section>
+
+    <section id="movieSection" class="tab">
+      <h2>🎬 Danh sách phim</h2>
+      <ul id="movieList"></ul>
+      <video id="videoPlayer" controls></video>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Nguyễn Hải Huy | MediaHub</p>
+  </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
