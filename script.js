@@ -18,22 +18,30 @@ for (let i = 0; i < boardSize * boardSize; i++) {
 }
 
 // --- KIỂM TRA THẮNG ---
-function checkWin(x, y, player) {
-  const dirs = [[1,0],[0,1],[1,1],[1,-1]];
-  for (let [dx, dy] of dirs) {
-    let count = 1;
-    for (let dir of [-1, 1]) {
-      let i = 1;
-      while (true) {
-        const nx = x + dx * i * dir;
-        const ny = y + dy * i * dir;
-        if (nx < 0 || ny < 0 || nx >= boardSize || ny >= boardSize || board[nx][ny] !== player)
-          break;
-        count++;
-        i++;
+function checkWin(player) {
+  const directions = [
+    [1, 0], // ngang
+    [0, 1], // dọc
+    [1, 1], // chéo xuống
+    [1, -1] // chéo lên
+  ];
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (board[y][x] === player) {
+        for (let [dx, dy] of directions) {
+          let count = 1;
+          for (let i = 1; i < 5; i++) {
+            const nx = x + dx * i;
+            const ny = y + dy * i;
+            if (nx < 0 || ny < 0 || nx >= size || ny >= size) break;
+            if (board[ny][nx] === player) count++;
+            else break;
+          }
+          if (count >= 5) return true;
+        }
       }
     }
-    if (count >= 5) return true;
   }
   return false;
 }
