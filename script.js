@@ -1,239 +1,161 @@
-// --- ÂM THANH KHI THUA ---
-const loseAudio = new Audio("lose.mp3"); // hoặc link mp3 online
-loseAudio.loop = false; // phát 1 lần
-
-const boardSize = 20;
-let board = Array(boardSize).fill().map(() => Array(boardSize).fill(""));
+const size = 50;
+let board = [];
+let currentPlayer = "X";
 let gameOver = false;
-let lastAIMove = null;
+let offsetX = 0, offsetY = 0, scale = 1, rotation = 0;
+let isDragging = false, lastX, lastY;
 
-const boardEl = document.getElementById("board");
-const statusEl = document.getElementById("status");
+const boardElement = document.getElementById("board");
+const statusText = document.getElementById("status");
 const resetBtn = document.getElementById("reset");
 
-// --- TẠO BÀN CỜ ---
-for (let i = 0; i < boardSize * boardSize; i++) {
-  const cell = document.createElement("div");
-  cell.classList.add("cell");
-  cell.dataset.index = i;
-  boardEl.appendChild(cell);
-}
-
-// --- KIỂM TRA THẮNG ---
-function checkWin(player) {
-  const dirs = [
-    [1, 0],  // ngang
-    [0, 1],  // dọc
-    [1, 1],  // chéo xuống
-    [1, -1]  // chéo lên
-  ];
-
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j] !== player) continue;
-      for (let [dx, dy] of dirs) {
-        let count = 1;
-        for (let k = 1; k < 5; k++) {
-          const ni = i + dx * k;
-          const nj = j + dy * k;
-          if (ni < 0 || nj < 0 || ni >= boardSize || nj >= boardSize) break;
-          if (board[ni][nj] === player) count++;
-          else break;
-        }
-        if (count >= 5) return true;
-      }
-    }
+for (let i = 0; i < size; i++) {
+  board[i] = [];
+  for (let j = 0; j < size; j++) {
+    board[i][j] = "";
+    const cell = document.createElement("div");
+    cell.classList.add("cell");
+    cell.addEventListener("click", () => handleClick(i, j, cell));
+    boardElement.appendChild(cell);
   }
-  return false;
 }
 
-// --- AI THÔNG MINH ---
+function handleClick(i, j, cell) {
+  if (gameOver || board[i][j] !== "") return;
+  board[i][j] = currentPlayer;
+  cell.textContent = currentPlayer;
+  cell.classList.add(currentPlayer.toLowerCase());
+
+  if (checkWin(i, j)) {
+    statusText.textContent = `🎉 Người chơi (${currentPlayer}) thắng!`;
+    gameOver = true;
+    return;
+  }
+
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  if (currentPlayer === "O") aiMove();
+}
+
 function aiMove() {
-  if (gameOver) return;
+  let bestScore = -Infinity;
+  let move = null;
 
-  let move = findSmartMove();
-  if (!move) move = findNearPlayer();
-  if (!move) move = findAnyMove();
-
-  if (move) {
-    document.querySelectorAll(".ai-highlight").forEach(c => c.classList.remove("ai-highlight"));
-    board[move.i][move.j] = "O";
-    lastAIMove = move;
-    render();
-
-    if (checkWin("O")) {
-      statusEl.textContent = "🤖 AI thắng! Không thể chống lại trí tuệ nhân tạo!";
-      gameOver = true;
-      loseAudio.currentTime = 0;
-      loseAudio.play();
-    }
-  }
-}
-
-// --- TÌM NƯỚC ĐI THÔNG MINH ---
-function findSmartMove() {
-  let bestMove = null;
-
-  // 1️⃣ AI có thể thắng ngay => đánh luôn
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
       if (board[i][j] === "") {
         board[i][j] = "O";
-        if (checkWin("O")) {
-          board[i][j] = "";
-          return { i, j };
-        }
+        let score = evaluate(i, j, "O");
         board[i][j] = "";
+        if (score > bestScore) {
+          bestScore = score;
+          move = [i, j];
+        }
       }
     }
   }
 
-  // 2️⃣ Chặn người chơi nếu sắp thắng
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j] === "") {
-        board[i][j] = "X";
-        if (checkWin("X")) {
-          board[i][j] = "";
-          return { i, j };
-        }
-        board[i][j] = "";
-      }
-    }
-  }
+  if (move) {
+    const idx = move[0] * size + move[1];
+    const cell = boardElement.children[idx];
+    board[move[0]][move[1]] = "O";
+    cell.textContent = "O";
+    cell.classList.add("o");
 
-  // 3️⃣ Đánh nước tốt nhất
-  let bestScore = -Infinity;
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j] === "") {
-        const scoreO = evaluatePosition(i, j, "O");
-        const scoreX = evaluatePosition(i, j, "X");
-        const total = scoreO + scoreX * 0.9;
-        if (total > bestScore) {
-          bestScore = total;
-          bestMove = { i, j };
-        }
-      }
-    }
+    if (checkWin(move[0], move[1])) {
+      statusText.textContent = "🤖 AI thắng rồi!";
+      gameOver = true;
+    } else currentPlayer = "X";
   }
-  return bestMove;
 }
 
-// --- ĐÁNH GIÁ VỊ TRÍ ---
-function evaluatePosition(x, y, player) {
-  const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+function evaluate(x, y, player) {
   let score = 0;
-  for (let [dx, dy] of dirs) {
-    let count = 0, openEnds = 0;
-    let i = 1;
-    while (true) {
-      const nx = x + dx * i, ny = y + dy * i;
-      if (nx < 0 || ny < 0 || nx >= boardSize || ny >= boardSize) break;
-      if (board[nx][ny] === player) count++;
-      else if (board[nx][ny] === "") { openEnds++; break; }
-      else break;
-      i++;
+  const dirs = [
+    [1, 0],
+    [0, 1],
+    [1, 1],
+    [1, -1],
+  ];
+
+  for (const [dx, dy] of dirs) {
+    let count = 1;
+
+    for (let k = 1; k < 5; k++) {
+      const nx = x + dx * k, ny = y + dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
+      count++;
     }
-    i = 1;
-    while (true) {
-      const nx = x - dx * i, ny = y - dy * i;
-      if (nx < 0 || ny < 0 || nx >= boardSize || ny >= boardSize) break;
-      if (board[nx][ny] === player) count++;
-      else if (board[nx][ny] === "") { openEnds++; break; }
-      else break;
-      i++;
+    for (let k = 1; k < 5; k++) {
+      const nx = x - dx * k, ny = y - dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
+      count++;
     }
-    if (count >= 4) score += 10000;
-    else if (count === 3 && openEnds === 2) score += 1000;
-    else if (count === 3 && openEnds === 1) score += 200;
-    else if (count === 2 && openEnds === 2) score += 100;
-    else if (count === 2 && openEnds === 1) score += 30;
-    else if (count === 1 && openEnds === 2) score += 10;
+    score = Math.max(score, count);
   }
   return score;
 }
 
-// --- ĐÁNH GẦN NGƯỜI CHƠI ---
-function findNearPlayer() {
-  const last = getLastPlayerMove();
-  if (!last) return null;
-  const { x, y } = last;
-  const range = 2;
-  for (let r = 1; r <= range; r++) {
-    for (let i = x - r; i <= x + r; i++) {
-      for (let j = y - r; j <= y + r; j++) {
-        if (i >= 0 && j >= 0 && i < boardSize && j < boardSize && board[i][j] === "")
-          return { i, j };
-      }
+function checkWin(x, y) {
+  const player = board[x][y];
+  const dirs = [
+    [1, 0],
+    [0, 1],
+    [1, 1],
+    [1, -1],
+  ];
+
+  for (const [dx, dy] of dirs) {
+    let count = 1;
+    for (let k = 1; k < 5; k++) {
+      const nx = x + dx * k, ny = y + dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
+      count++;
     }
+    for (let k = 1; k < 5; k++) {
+      const nx = x - dx * k, ny = y - dy * k;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size || board[nx][ny] !== player) break;
+      count++;
+    }
+    if (count >= 5) return true;
   }
-  return null;
+  return false;
 }
 
-function getLastPlayerMove() {
-  for (let i = boardSize - 1; i >= 0; i--) {
-    for (let j = boardSize - 1; j >= 0; j--) {
-      if (board[i][j] === "X") return { x: i, y: j };
-    }
-  }
-  return null;
-}
+resetBtn.addEventListener("click", () => location.reload());
 
-function findAnyMove() {
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j] === "") return { i, j };
-    }
-  }
-  return null;
-}
+// ----- Kéo / zoom / xoay khung -----
+const container = document.getElementById("board-container");
 
-// --- HIỂN THỊ ---
-function render() {
-  const cells = document.querySelectorAll(".cell");
-  cells.forEach((cell, idx) => {
-    const i = Math.floor(idx / boardSize);
-    const j = idx % boardSize;
-    cell.textContent = board[i][j];
-    cell.className = `cell ${board[i][j].toLowerCase()}`;
-    if (lastAIMove && i === lastAIMove.i && j === lastAIMove.j) {
-      cell.classList.add("ai-highlight");
-    }
-  });
-}
-
-// --- NGƯỜI CHƠI ---
-document.querySelectorAll(".cell").forEach(cell => {
-  cell.addEventListener("click", () => {
-    if (gameOver) return;
-    const idx = parseInt(cell.dataset.index);
-    const x = Math.floor(idx / boardSize);
-    const y = idx % boardSize;
-    if (board[x][y] === "") {
-      board[x][y] = "X";
-      render();
-      if (checkWin("X")) {
-        statusEl.textContent = "🎉 Bạn thắng!";
-        gameOver = true;
-        return;
-      }
-      setTimeout(aiMove, 300);
-    }
-  });
+container.addEventListener("pointerdown", (e) => {
+  isDragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  container.style.cursor = "grabbing";
 });
 
-// --- NÚT CHƠI LẠI ---
-resetBtn.addEventListener("click", () => {
-  gameOver = false;
-  statusEl.textContent = "Người chơi đi trước!";
-  loseAudio.pause();
-  loseAudio.currentTime = 0;
-  lastAIMove = null;
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) board[i][j] = "";
-  }
-  render();
+container.addEventListener("pointermove", (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - lastX;
+  const dy = e.clientY - lastY;
+  offsetX += dx;
+  offsetY += dy;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  updateTransform();
 });
 
-render();
+container.addEventListener("pointerup", () => {
+  isDragging = false;
+  container.style.cursor = "grab";
+});
+
+container.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  if (e.ctrlKey) rotation += e.deltaY * 0.02;
+  else scale = Math.min(2.5, Math.max(0.5, scale - e.deltaY * 0.001));
+  updateTransform();
+});
+
+function updateTransform() {
+  boardElement.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation}deg)`;
+}
