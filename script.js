@@ -1,62 +1,72 @@
-// 🎵 Danh sách nhạc
-const musicList = [
-  { title: "trình", src: "lose.mp3" },
-  { title: "Nơi Này Có Anh - Sơn Tùng MTP", src: "music/noinaicoanh.mp3" },
+// Danh sách nhạc và video (file nằm cùng thư mục với HTML)
+const musicListData = [
+  { title: "Lạc Trôi - Sơn Tùng MTP", file: "lactroi.mp3", cover: "music.jpg" },
+  { title: "Nơi này có anh - Sơn Tùng MTP", file: "noinaicoanh.mp3", cover: "music2.jpg" }
 ];
 
-// 🎬 Danh sách phim
-const movieList = [
-  { title: "Spirited Away", src: "videos/spiritedaway.mp4" },
-  { title: "Avengers: Endgame", src: "videos/avengers.mp4" },
+const videoListData = [
+  { title: "MV Em Của Ngày Hôm Qua", file: "emcuangayhomqua.mp4", thumb: "video.jpg" },
+  { title: "Spirited Away Trailer", file: "spiritedaway.mp4", thumb: "video2.jpg" }
 ];
 
-// --- XỬ LÝ TAB ---
+// --- CHUYỂN TAB ---
 const musicTab = document.getElementById("musicTab");
-const movieTab = document.getElementById("movieTab");
+const videoTab = document.getElementById("videoTab");
 const musicSection = document.getElementById("musicSection");
-const movieSection = document.getElementById("movieSection");
+const videoSection = document.getElementById("videoSection");
 
-musicTab.addEventListener("click", () => switchTab("music"));
-movieTab.addEventListener("click", () => switchTab("movie"));
+musicTab.onclick = () => {
+  musicTab.classList.add("active");
+  videoTab.classList.remove("active");
+  musicSection.classList.add("active");
+  videoSection.classList.remove("active");
+};
 
-function switchTab(tab) {
-  if (tab === "music") {
-    musicSection.classList.add("active");
-    movieSection.classList.remove("active");
-    musicTab.classList.add("active");
-    movieTab.classList.remove("active");
-  } else {
-    movieSection.classList.add("active");
-    musicSection.classList.remove("active");
-    movieTab.classList.add("active");
-    musicTab.classList.remove("active");
-  }
-}
+videoTab.onclick = () => {
+  videoTab.classList.add("active");
+  musicTab.classList.remove("active");
+  videoSection.classList.add("active");
+  musicSection.classList.remove("active");
+};
 
-// --- HIỂN THỊ DANH SÁCH NHẠC ---
-const musicListEl = document.getElementById("musicList");
+// --- NHẠC ---
+const musicList = document.getElementById("musicList");
 const audioPlayer = document.getElementById("audioPlayer");
 
-musicList.forEach((song) => {
-  const li = document.createElement("li");
-  li.textContent = song.title;
-  li.addEventListener("click", () => {
-    audioPlayer.src = song.src;
+musicListData.forEach(song => {
+  const item = document.createElement("div");
+  item.className = "music-item";
+  item.innerHTML = `
+    <img src="${song.cover}" alt="cover">
+    <div>
+      <strong>${song.title}</strong>
+      <p>${song.file}</p>
+    </div>
+  `;
+  item.onclick = () => {
+    audioPlayer.src = song.file;
     audioPlayer.play();
-  });
-  musicListEl.appendChild(li);
+  };
+  musicList.appendChild(item);
 });
 
-// --- HIỂN THỊ DANH SÁCH PHIM ---
-const movieListEl = document.getElementById("movieList");
+// --- VIDEO ---
+const videoList = document.getElementById("videoList");
 const videoPlayer = document.getElementById("videoPlayer");
 
-movieList.forEach((movie) => {
-  const li = document.createElement("li");
-  li.textContent = movie.title;
-  li.addEventListener("click", () => {
-    videoPlayer.src = movie.src;
+videoListData.forEach(vid => {
+  const item = document.createElement("div");
+  item.className = "video-item";
+  item.innerHTML = `
+    <img src="${vid.thumb}" alt="thumb">
+    <div>
+      <strong>${vid.title}</strong>
+      <p>${vid.file}</p>
+    </div>
+  `;
+  item.onclick = () => {
+    videoPlayer.src = vid.file;
     videoPlayer.play();
-  });
-  movieListEl.appendChild(li);
+  };
+  videoList.appendChild(item);
 });
