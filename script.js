@@ -1,6 +1,6 @@
 // Danh sách nhạc và video (file nằm cùng thư mục với HTML)
 const musicListData = [
-  { title: "trình", file: "lose.mp3", cover: "music.jpg" },
+  { title: "trình", file: "trinh.mp3", cover: "music.jpg" },
   { title: "Nơi này có anh - Sơn Tùng MTP", file: "noinaicoanh.mp3", cover: "music2.jpg" }
 ];
 
