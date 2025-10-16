@@ -246,4 +246,47 @@ resetBtn.addEventListener("click", () => {
   loseAudio.currentTime = 0; // tua lại đầu
 });
 
+// --- NÚT GỢI Ý ---
+const hintBtn = document.getElementById("hint");
+
+hintBtn.addEventListener("click", () => {
+  if (gameOver) return;
+  
+  // Xoá gợi ý cũ
+  document.querySelectorAll(".hint").forEach(c => c.classList.remove("hint"));
+  
+  // Tìm nước gợi ý tốt nhất cho người chơi (X)
+  const bestHint = findSmartMoveForPlayer("X");
+  
+  if (bestHint) {
+    const hintIndex = bestHint.i * boardSize + bestHint.j;
+    const hintCell = document.querySelector(`.cell[data-index='${hintIndex}']`);
+    if (hintCell) hintCell.classList.add("hint");
+    statusEl.textContent = "💡 Gợi ý: Hãy đánh vào ô đang sáng!";
+  } else {
+    statusEl.textContent = "🤔 Không tìm thấy gợi ý hợp lý!";
+  }
+});
+
+// --- HÀM TÌM GỢI Ý CHO NGƯỜI CHƠI ---
+function findSmartMoveForPlayer(player) {
+  let bestMove = null;
+  let bestScore = -Infinity;
+
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      if (board[i][j] === "") {
+        const scoreSelf = evaluatePosition(i, j, player);
+        const scoreOpponent = evaluatePosition(i, j, player === "X" ? "O" : "X");
+        const total = scoreSelf + scoreOpponent * 0.8; // vừa công vừa thủ
+        if (total > bestScore) {
+          bestScore = total;
+          bestMove = { i, j };
+        }
+      }
+    }
+  }
+  return bestMove;
+}
+
 render();
