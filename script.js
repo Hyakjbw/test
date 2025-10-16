@@ -1,3 +1,6 @@
+// --- ÂM THANH KHI THUA ---
+const loseAudio = new Audio("lose.mp3"); // hoặc link mp3 online
+loseAudio.loop = false; // phát 1 lần
 const boardSize = 20;
 let board = Array(boardSize).fill().map(() => Array(boardSize).fill(""));
 let gameOver = false;
@@ -59,8 +62,10 @@ function aiMove() {
   if (aiCell) aiCell.classList.add("ai-highlight");
 
   if (checkWin(move.i, move.j, "O")) {
-    statusEl.textContent = "🤖 AI thắng! Không thể chống lại trí tuệ nhân tạo!";
-    gameOver = true;
+  statusEl.textContent = "🤖 AI thắng! Không thể chống lại trí tuệ nhân tạo!";
+  gameOver = true;
+  loseAudio.currentTime = 0; // phát từ đầu
+  loseAudio.play(); // phát nhạc thua
     }
   }
 }
@@ -235,9 +240,10 @@ document.querySelectorAll(".cell").forEach(cell => {
 resetBtn.addEventListener("click", () => {
   board = Array(boardSize).fill().map(() => Array(boardSize).fill(""));
   gameOver = false;
-  lastAIMove = null; // reset highlight
   statusEl.textContent = "Người chơi đi trước!";
   render();
+  loseAudio.pause(); // dừng nhạc
+  loseAudio.currentTime = 0; // tua lại đầu
 });
 
 render();
