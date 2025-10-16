@@ -19,27 +19,27 @@ for (let i = 0; i < boardSize * boardSize; i++) {
 
 // --- KIỂM TRA THẮNG ---
 function checkWin(player) {
-  const directions = [
-    [1, 0], // ngang
-    [0, 1], // dọc
-    [1, 1], // chéo xuống
-    [1, -1] // chéo lên
+  const dirs = [
+    [1, 0],  // ngang
+    [0, 1],  // dọc
+    [1, 1],  // chéo xuống
+    [1, -1]  // chéo lên
   ];
 
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      if (board[y][x] === player) {
-        for (let [dx, dy] of directions) {
-          let count = 1;
-          for (let i = 1; i < 5; i++) {
-            const nx = x + dx * i;
-            const ny = y + dy * i;
-            if (nx < 0 || ny < 0 || nx >= size || ny >= size) break;
-            if (board[ny][nx] === player) count++;
-            else break;
-          }
-          if (count >= 5) return true;
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      if (board[i][j] !== player) continue;
+
+      for (let [dx, dy] of dirs) {
+        let count = 1;
+        for (let k = 1; k < 5; k++) {
+          const ni = i + dx * k;
+          const nj = j + dy * k;
+          if (ni < 0 || nj < 0 || ni >= boardSize || nj >= boardSize) break;
+          if (board[ni][nj] === player) count++;
+          else break;
         }
+        if (count >= 5) return true;
       }
     }
   }
@@ -246,12 +246,22 @@ document.querySelectorAll(".cell").forEach(cell => {
 
 // --- NÚT CHƠI LẠI ---
 resetBtn.addEventListener("click", () => {
-  board = Array(boardSize).fill().map(() => Array(boardSize).fill(""));
   gameOver = false;
   statusEl.textContent = "Người chơi đi trước!";
-  render();
-  loseAudio.pause(); // dừng nhạc
-  loseAudio.currentTime = 0; // tua lại đầu
+
+  // Xóa toàn bộ dữ liệu cũ
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      board[i][j] = "";
+    }
+  }
+
+  // Cập nhật lại toàn bộ ô hiển thị
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach(c => {
+    c.textContent = "";
+    c.className = "cell";
+  });
 });
 
 // --- NÚT GỢI Ý ---
