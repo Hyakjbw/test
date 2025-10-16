@@ -88,3 +88,13 @@ footer {
   box-shadow: 0 0 10px #00eaff;
   transition: background-color 0.5s, box-shadow 0.5s;
 }
+.cell.hint {
+  background-color: rgba(255, 255, 100, 0.3);
+  box-shadow: 0 0 10px yellow;
+  animation: hintBlink 1s infinite alternate;
+}
+
+@keyframes hintBlink {
+  from { box-shadow: 0 0 5px yellow; }
+  to { box-shadow: 0 0 15px yellow; }
+}
