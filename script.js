@@ -1,15 +1,17 @@
 // --- ÂM THANH KHI THUA ---
 const loseAudio = new Audio("lose.mp3"); // hoặc link mp3 online
 loseAudio.loop = false; // phát 1 lần
+
 const boardSize = 20;
 let board = Array(boardSize).fill().map(() => Array(boardSize).fill(""));
 let gameOver = false;
-let lastAIMove = null; // 👈 Lưu ô AI vừa đánh
+let lastAIMove = null;
 
 const boardEl = document.getElementById("board");
 const statusEl = document.getElementById("status");
 const resetBtn = document.getElementById("reset");
 
+// --- TẠO BÀN CỜ ---
 for (let i = 0; i < boardSize * boardSize; i++) {
   const cell = document.createElement("div");
   cell.classList.add("cell");
@@ -29,7 +31,6 @@ function checkWin(player) {
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize; j++) {
       if (board[i][j] !== player) continue;
-
       for (let [dx, dy] of dirs) {
         let count = 1;
         for (let k = 1; k < 5; k++) {
@@ -46,34 +47,25 @@ function checkWin(player) {
   return false;
 }
 
-// --- AI THÔNG MINH KHÔNG XUNG ĐỘT ---
+// --- AI THÔNG MINH ---
 function aiMove() {
-  let move = findSmartMove(); // đánh theo chiến thuật
+  if (gameOver) return;
 
-  // nếu không tìm được nước thông minh, mới đánh gần người chơi
+  let move = findSmartMove();
   if (!move) move = findNearPlayer();
-
-  // nếu vẫn không có (bàn trống), đánh ngẫu nhiên
   if (!move) move = findAnyMove();
 
   if (move) {
-  // --- Xóa sáng cũ ---
-  document.querySelectorAll(".ai-highlight").forEach(c => c.classList.remove("ai-highlight"));
+    document.querySelectorAll(".ai-highlight").forEach(c => c.classList.remove("ai-highlight"));
+    board[move.i][move.j] = "O";
+    lastAIMove = move;
+    render();
 
-  // --- Đánh nước mới ---
-  board[move.i][move.j] = "O";
-  render();
-
-  // --- Sáng ô AI vừa đánh ---
-  const aiIndex = move.i * boardSize + move.j;
-  const aiCell = document.querySelector(`.cell[data-index='${aiIndex}']`);
-  if (aiCell) aiCell.classList.add("ai-highlight");
-
-  if (checkWin(move.i, move.j, "O")) {
-  statusEl.textContent = "🤖 AI thắng! Không thể chống lại trí tuệ nhân tạo!";
-  gameOver = true;
-  loseAudio.currentTime = 0; // phát từ đầu
-  loseAudio.play(); // phát nhạc thua
+    if (checkWin("O")) {
+      statusEl.textContent = "🤖 AI thắng! Không thể chống lại trí tuệ nhân tạo!";
+      gameOver = true;
+      loseAudio.currentTime = 0;
+      loseAudio.play();
     }
   }
 }
@@ -82,12 +74,12 @@ function aiMove() {
 function findSmartMove() {
   let bestMove = null;
 
-  // 1️⃣: Nếu AI có thể thắng ngay => Đánh luôn
+  // 1️⃣ AI có thể thắng ngay => đánh luôn
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize; j++) {
       if (board[i][j] === "") {
         board[i][j] = "O";
-        if (checkWin(i, j, "O")) {
+        if (checkWin("O")) {
           board[i][j] = "";
           return { i, j };
         }
@@ -96,12 +88,12 @@ function findSmartMove() {
     }
   }
 
-  // 2️⃣: Nếu người chơi sắp thắng => Chặn lại
+  // 2️⃣ Chặn người chơi nếu sắp thắng
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize; j++) {
       if (board[i][j] === "") {
         board[i][j] = "X";
-        if (checkWin(i, j, "X")) {
+        if (checkWin("X")) {
           board[i][j] = "";
           return { i, j };
         }
@@ -110,14 +102,14 @@ function findSmartMove() {
     }
   }
 
-  // 3️⃣: Ưu tiên nước có điểm mạnh nhất (đánh để tạo thế)
+  // 3️⃣ Đánh nước tốt nhất
   let bestScore = -Infinity;
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize; j++) {
       if (board[i][j] === "") {
         const scoreO = evaluatePosition(i, j, "O");
         const scoreX = evaluatePosition(i, j, "X");
-        const total = scoreO + scoreX * 0.9; // hơi ưu tiên chặn
+        const total = scoreO + scoreX * 0.9;
         if (total > bestScore) {
           bestScore = total;
           bestMove = { i, j };
@@ -125,44 +117,33 @@ function findSmartMove() {
       }
     }
   }
-
   return bestMove;
 }
 
-// --- ĐÁNH GIÁ VỊ TRÍ (AI CHIẾN LƯỢC) ---
+// --- ĐÁNH GIÁ VỊ TRÍ ---
 function evaluatePosition(x, y, player) {
   const dirs = [[1,0],[0,1],[1,1],[1,-1]];
   let score = 0;
-
   for (let [dx, dy] of dirs) {
-    let count = 0;
-    let openEnds = 0;
-
-    // hướng 1
+    let count = 0, openEnds = 0;
     let i = 1;
     while (true) {
-      const nx = x + dx * i;
-      const ny = y + dy * i;
+      const nx = x + dx * i, ny = y + dy * i;
       if (nx < 0 || ny < 0 || nx >= boardSize || ny >= boardSize) break;
       if (board[nx][ny] === player) count++;
       else if (board[nx][ny] === "") { openEnds++; break; }
       else break;
       i++;
     }
-
-    // hướng 2
     i = 1;
     while (true) {
-      const nx = x - dx * i;
-      const ny = y - dy * i;
+      const nx = x - dx * i, ny = y - dy * i;
       if (nx < 0 || ny < 0 || nx >= boardSize || ny >= boardSize) break;
       if (board[nx][ny] === player) count++;
       else if (board[nx][ny] === "") { openEnds++; break; }
       else break;
       i++;
     }
-
-    // chấm điểm
     if (count >= 4) score += 10000;
     else if (count === 3 && openEnds === 2) score += 1000;
     else if (count === 3 && openEnds === 1) score += 200;
@@ -173,7 +154,7 @@ function evaluatePosition(x, y, player) {
   return score;
 }
 
-// --- ƯU TIÊN ĐÁNH GẦN NGƯỜI CHƠI ---
+// --- ĐÁNH GẦN NGƯỜI CHƠI ---
 function findNearPlayer() {
   const last = getLastPlayerMove();
   if (!last) return null;
@@ -216,15 +197,13 @@ function render() {
     const j = idx % boardSize;
     cell.textContent = board[i][j];
     cell.className = `cell ${board[i][j].toLowerCase()}`;
-    
-    // 🌟 Làm sáng ô AI vừa đánh
     if (lastAIMove && i === lastAIMove.i && j === lastAIMove.j) {
       cell.classList.add("ai-highlight");
     }
   });
 }
 
-// --- NGƯỜI CHƠI ĐÁNH ---
+// --- NGƯỜI CHƠI ---
 document.querySelectorAll(".cell").forEach(cell => {
   cell.addEventListener("click", () => {
     if (gameOver) return;
@@ -234,12 +213,12 @@ document.querySelectorAll(".cell").forEach(cell => {
     if (board[x][y] === "") {
       board[x][y] = "X";
       render();
-      if (checkWin(x, y, "X")) {
+      if (checkWin("X")) {
         statusEl.textContent = "🎉 Bạn thắng!";
         gameOver = true;
         return;
       }
-      setTimeout(aiMove, 250);
+      setTimeout(aiMove, 300);
     }
   });
 });
@@ -248,63 +227,13 @@ document.querySelectorAll(".cell").forEach(cell => {
 resetBtn.addEventListener("click", () => {
   gameOver = false;
   statusEl.textContent = "Người chơi đi trước!";
-
-  // Xóa toàn bộ dữ liệu cũ
+  loseAudio.pause();
+  loseAudio.currentTime = 0;
+  lastAIMove = null;
   for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      board[i][j] = "";
-    }
+    for (let j = 0; j < boardSize; j++) board[i][j] = "";
   }
-
-  // Cập nhật lại toàn bộ ô hiển thị
-  const cells = document.querySelectorAll(".cell");
-  cells.forEach(c => {
-    c.textContent = "";
-    c.className = "cell";
-  });
+  render();
 });
-
-// --- NÚT GỢI Ý ---
-const hintBtn = document.getElementById("hint");
-
-hintBtn.addEventListener("click", () => {
-  if (gameOver) return;
-  
-  // Xoá gợi ý cũ
-  document.querySelectorAll(".hint").forEach(c => c.classList.remove("hint"));
-  
-  // Tìm nước gợi ý tốt nhất cho người chơi (X)
-  const bestHint = findSmartMoveForPlayer("X");
-  
-  if (bestHint) {
-    const hintIndex = bestHint.i * boardSize + bestHint.j;
-    const hintCell = document.querySelector(`.cell[data-index='${hintIndex}']`);
-    if (hintCell) hintCell.classList.add("hint");
-    statusEl.textContent = "💡 Gợi ý: Hãy đánh vào ô đang sáng!";
-  } else {
-    statusEl.textContent = "🤔 Không tìm thấy gợi ý hợp lý!";
-  }
-});
-
-// --- HÀM TÌM GỢI Ý CHO NGƯỜI CHƠI ---
-function findSmartMoveForPlayer(player) {
-  let bestMove = null;
-  let bestScore = -Infinity;
-
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j] === "") {
-        const scoreSelf = evaluatePosition(i, j, player);
-        const scoreOpponent = evaluatePosition(i, j, player === "X" ? "O" : "X");
-        const total = scoreSelf + scoreOpponent * 0.8; // vừa công vừa thủ
-        if (total > bestScore) {
-          bestScore = total;
-          bestMove = { i, j };
-        }
-      }
-    }
-  }
-  return bestMove;
-}
 
 render();
