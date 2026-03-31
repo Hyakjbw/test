@@ -1,38 +1,88 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blue Media Hub</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Web Canvas PvP Prototype</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #222; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        
+        /* Canvas Game */
+        #gameCanvas { display: none; width: 100vw; height: 100vh; display: block; }
+        
+        /* UI Lớp phủ ngoài Canvas */
+        .overlay { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); z-index: 10; }
+        .hidden { display: none !important; }
+        
+        /* Lobby UI */
+        .lobby-panel { background: #333; padding: 30px; border-radius: 10px; width: 400px; text-align: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .lobby-panel h1 { margin-bottom: 20px; color: #4CAF50; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #aaa; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #555; background: #222; color: #fff; }
+        .btn { padding: 12px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; transition: background 0.2s; }
+        .btn:hover { background: #45a049; }
+        
+        /* In-game HUD */
+        #hud { position: absolute; top: 20px; left: 20px; z-index: 5; display: none; pointer-events: none; }
+        .hud-bar-bg { width: 200px; height: 20px; background: #333; border: 2px solid #111; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        #hp-bar { height: 100%; background: #ff4444; width: 100%; transition: width 0.1s; }
+        #skill-cd-bar { height: 100%; background: #44aaff; width: 100%; }
+        .hud-text { position: absolute; font-size: 12px; font-weight: bold; margin-top: -20px; margin-left: 5px; text-shadow: 1px 1px 0 #000; }
+        
+        /* Game Over */
+        #gameOverOverlay { z-index: 20; }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>🎧 Blue Media Hub</h1>
-    <nav>
-      <button id="musicTab" class="active">Nhạc</button>
-      <button id="videoTab">Video</button>
-    </nav>
-  </header>
 
-  <main>
-    <!-- MỤC NHẠC -->
-    <section id="musicSection" class="section active">
-      <div id="musicList" class="list"></div>
-      <audio id="audioPlayer" controls></audio>
-    </section>
+    <div id="hud">
+        <div class="hud-text" style="top: 2px;">HP</div>
+        <div class="hud-bar-bg"><div id="hp-bar"></div></div>
+        <div class="hud-text" style="top: 32px;">Skill CD</div>
+        <div class="hud-bar-bg"><div id="skill-cd-bar"></div></div>
+    </div>
 
-    <!-- MỤC VIDEO -->
-    <section id="videoSection" class="section">
-      <div id="videoList" class="list"></div>
-      <video id="videoPlayer" controls></video>
-    </section>
-  </main>
+    <div id="lobbyOverlay" class="overlay">
+        <div class="lobby-panel">
+            <h1>PvP Arena</h1>
+            <div class="input-group">
+                <label>Tên người chơi:</label>
+                <input type="text" id="playerName" value="Player1" maxlength="10">
+            </div>
+            <div class="input-group">
+                <label>Vũ khí (Class):</label>
+                <select id="weaponSelect">
+                    <option value="sword">Kiếm (Cận chiến - Skill: Dash)</option>
+                    <option value="bow">Cung (Tầm xa - Skill: Multishot)</option>
+                    <option value="staff">Trượng (Phép thuật - Skill: AoE Burst)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Bản đồ:</label>
+                <select id="mapSelect">
+                    <option value="grass">Thảo nguyên xanh (Ít vật cản)</option>
+                    <option value="lava">Vùng đất dung nham (Nhiều vật cản)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>ID Phòng (Room ID):</label>
+                <input type="text" id="roomId" value="room_test" placeholder="Nhập để join hoặc tạo mới">
+            </div>
+            <button class="btn" id="joinBtn">Vào Trận</button>
+        </div>
+    </div>
 
-  <footer>
-    <p>© 2025 Blue Media Hub – by Nguyễn Hải Huy </p>
-  </footer>
+    <div id="gameOverOverlay" class="overlay hidden">
+        <div class="lobby-panel">
+            <h1 id="gameOverMessage" style="color: #ff4444;">Bạn Đã Chết!</h1>
+            <button class="btn" onclick="location.reload()">Chơi Lại</button>
+        </div>
+    </div>
 
-  <script src="script.js"></script>
+    <canvas id="gameCanvas"></canvas>
+
+    <script type="module" src="game.js"></script>
 </body>
 </html>
