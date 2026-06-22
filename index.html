@@ -3,86 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Web Canvas PvP Prototype</title>
+    <title>Web Video Portal & Tools</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #222; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --accent: #fd0d5d;
+            --yt-red: #ff0000;
+            --tt-cyan: #00f2ea;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        h1 { font-size: 1.5rem; margin-bottom: 25px; font-weight: 600; }
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 15px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.2s, opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-yt { background-color: var(--yt-red); }
+        .btn-tt { background: linear-gradient(45deg, #000, #fe2c55); }
         
-        /* Canvas Game */
-        #gameCanvas { display: none; width: 100vw; height: 100vh; display: block; }
+        .tool-section {
+            text-align: left;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px dashed #475569;
+        }
+        .tool-section h2 { font-size: 1rem; margin-bottom: 10px; color: var(--accent); }
+        .tool-section p { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; margin-bottom: 15px; }
         
-        /* UI Lớp phủ ngoài Canvas */
-        .overlay { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); z-index: 10; }
-        .hidden { display: none !important; }
-        
-        /* Lobby UI */
-        .lobby-panel { background: #333; padding: 30px; border-radius: 10px; width: 400px; text-align: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .lobby-panel h1 { margin-bottom: 20px; color: #4CAF50; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #aaa; }
-        .input-group input, .input-group select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #555; background: #222; color: #fff; }
-        .btn { padding: 12px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; transition: background 0.2s; }
-        .btn:hover { background: #45a049; }
-        
-        /* In-game HUD */
-        #hud { position: absolute; top: 20px; left: 20px; z-index: 5; display: none; pointer-events: none; }
-        .hud-bar-bg { width: 200px; height: 20px; background: #333; border: 2px solid #111; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-        #hp-bar { height: 100%; background: #ff4444; width: 100%; transition: width 0.1s; }
-        #skill-cd-bar { height: 100%; background: #44aaff; width: 100%; }
-        .hud-text { position: absolute; font-size: 12px; font-weight: bold; margin-top: -20px; margin-left: 5px; text-shadow: 1px 1px 0 #000; }
-        
-        /* Game Over */
-        #gameOverOverlay { z-index: 20; }
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .copy-btn:active { background: #d90b4f; }
+
+        .pip-note {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: #64748b;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
-    <div id="hud">
-        <div class="hud-text" style="top: 2px;">HP</div>
-        <div class="hud-bar-bg"><div id="hp-bar"></div></div>
-        <div class="hud-text" style="top: 32px;">Skill CD</div>
-        <div class="hud-bar-bg"><div id="skill-cd-bar"></div></div>
-    </div>
+    <div class="container">
+        <h1>🎬 Web Video Portal</h1>
 
-    <div id="lobbyOverlay" class="overlay">
-        <div class="lobby-panel">
-            <h1>PvP Arena</h1>
-            <div class="input-group">
-                <label>Tên người chơi:</label>
-                <input type="text" id="playerName" value="Player1" maxlength="10">
-            </div>
-            <div class="input-group">
-                <label>Vũ khí (Class):</label>
-                <select id="weaponSelect">
-                    <option value="sword">Kiếm (Cận chiến - Skill: Dash)</option>
-                    <option value="bow">Cung (Tầm xa - Skill: Multishot)</option>
-                    <option value="staff">Trượng (Phép thuật - Skill: AoE Burst)</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Bản đồ:</label>
-                <select id="mapSelect">
-                    <option value="grass">Thảo nguyên xanh (Ít vật cản)</option>
-                    <option value="lava">Vùng đất dung nham (Nhiều vật cản)</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>ID Phòng (Room ID):</label>
-                <input type="text" id="roomId" value="room_test" placeholder="Nhập để join hoặc tạo mới">
-            </div>
-            <button class="btn" id="joinBtn">Vào Trận</button>
+        <div class="btn-group">
+            <a href="https://m.youtube.com" target="_blank" class="btn btn-yt">
+                YouTube Web
+            </a>
+            <a href="https://www.tiktok.com" target="_blank" class="btn btn-tt">
+                TikTok Web
+            </a>
+        </div>
+
+        <div class="tool-section">
+            <h2>🛠️ Speed & Pitch Tool (Yuptude)</h2>
+            <p>Vì bảo mật, bạn không thể chạy code từ đây. Hãy cài đặt <b>Bookmarklet</b>:</p>
+            <ol style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 15px; padding-left: 15px;">
+                <li>Nhấn nút <b>Copy Code</b> bên dưới.</li>
+                <li>Mở YouTube/TikTok trên trình duyệt.</li>
+                <li>Tạo 1 dấu trang (Bookmark) mới.</li>
+                <li>Dán đoạn code đã copy vào phần <b>URL</b>.</li>
+                <li>Khi đang xem video, nhấn vào dấu trang đó để mở bảng điều khiển.</li>
+            </ol>
+            <button class="copy-btn" onclick="copyJS()">📋 Copy Bookmarklet Code</button>
+        </div>
+
+        <div class="pip-note">
+            💡 <b>Mẹo PiP trên iPhone:</b> Mở video ở chế độ toàn màn hình → Vuốt lên để về màn hình chính. (Yêu cầu bật PiP trong Cài đặt chung của iOS).
         </div>
     </div>
 
-    <div id="gameOverOverlay" class="overlay hidden">
-        <div class="lobby-panel">
-            <h1 id="gameOverMessage" style="color: #ff4444;">Bạn Đã Chết!</h1>
-            <button class="btn" onclick="location.reload()">Chơi Lại</button>
-        </div>
-    </div>
+    <script>
+        // Đây là đoạn JS bạn cung cấp, đã được format lại thành dạng bookmarklet
+        const bookmarkletCode = `javascript:(function(){function dg(t){return document.getElementById(t)}function yte_in(){s=dg("yptd-in").value}function yte_off(){yti_in.removeEventListener("input",yte_in),yti_off.removeEventListener("click",yte_off),yti_pit.removeEventListener("click",yte_pit),yti_up.removeEventListener("click",yte_up),yti_dwn.removeEventListener("click",yte_dwn),ytw.parentNode.removeChild(ytw),yts.parentNode.removeChild(yts),clearInterval(interval),s=1,pitch(1)}function yte_pit(){p=dg("yptd-pin").checked}function yte_up(){inputval=document.getElementById("yptd-in").value,inputval=inputval?parseFloat(inputval):1,inputval=3.9>=inputval?inputval+.1:inputval,s=dg("yptd-in").value=inputval.toFixed(1)}function yte_dwn(){inputval=dg("yptd-in").value,inputval=inputval?parseFloat(inputval):1,inputval=inputval>=.6?inputval-.1:inputval,s=dg("yptd-in").value=inputval.toFixed(1)}function pitch(t){for(var e=0;videos.length>e;e++)v=videos[e],v&&v.readyState>=2&&(v.playbackRate=t||s||1,v.mozPreservesPitch=v.webkitPreservesPitch=v.preservePitch=!p)}var s=1,p=!1,videos=document.querySelectorAll("video,audio"),v,inputval,ytw=document.createElement("div");ytw.innerHTML='<style id="yptd-style"> #yptd span,#yptd-box{float:left;padding:0 .5em;display:block}#yptd span em,#yptd-bottom,#yptd-in{vertical-align:middle}#yptd-pit,#yptd-pit input{float:right}#yptd a,#yptd-bar{background-color:#fd0d5d}#yptd{z-index:9999999999;position:fixed;bottom:0;left:6px;font:16px Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}#yptd *{margin:0}#yptd a{border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;float:left;margin:0 .5em 0 0;padding:.25em 1em;font-weight:700;color:#FFF}#yptd a em{font-size:.9em}#yptd a:active,#yptd a:focus,#yptd a:hover{outline:0;color:#fd0d5d;background-color:#FFF;text-decoration:none}#yptd span{border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box;margin:.5em;width:2.5em;border-bottom:2px solid rgba(0,0,0,.25);text-decoration:none;color:#000;background-color:#FFF;cursor:pointer;text-align:center}#yptd span em{font-size:.75em}#yptd span:active,#yptd span:focus,#yptd span:hover{color:#fd0d5d}#yptd-bar{border-radius:3px 3px 0 0;-moz-border-radius:3px 3px 0 0;-webkit-border-radius:3px 3px 0 0;height:2.25em}#yptd-bar:after,#yptd-bottom:after{content:"";display:block;clear:both}#yptd-controls{float:right;height:2.25em;border-left:2px solid rgba(0,0,0,.33)}#yptd-box{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box;width:4em;min-width:4em;height:100%;background-color:rgba(0,0,0,.15)}#yptd-in{width:100%;height:100%;border:0;text-align:center;font:14px Helvetica,Arial,sans-serif;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#FFF;background-color:transparent}#yptd-bottom{padding:.75em;font-size:.75em;background-color:rgba(0,0,0,.8)}#yptd-pit{position:relative;padding:.25em 0}#yptd-pit label{margin-right:.5em;color:#FFF}#yptd-pit em{display:none}#yptd-pit:active em,#yptd-pit:focus em,#yptd-pit:hover em{display:block;position:absolute;top:-2.5em;left:0;padding:.5em;white-space:pre;font-size:.8em;background-color:#fd0d5d} </style> <div id="yptd"> <div id="yptd-bar"> <span id="yptd-off"><em>Off</em></span> <div id="yptd-controls"> <span id="yptd-dwn">-</span> <div id="yptd-box"> <input id="yptd-in" type="text" value="'+s+'"> </div> <span id="yptd-up">+</span> </div> </div> <div id="yptd-bottom"> <a href="http://yuptude.com"><em>yuptude</em></a> <div id="yptd-pit"> <label for="yptd-pin"> Shift Pitch <em>(Firefox & Safari only)</em></label> <input type="checkbox" name="yptd-pin" id="yptd-pin" value="1" '+(p?'checked="checked" ':'")+'> </div> </div> </div>',document.body.appendChild(ytw);var ytw=dg("yptd"),yts=dg("yptd-style"),yti_in=dg("yptd-in"),yti_off=dg("yptd-off"),yti_pit=dg("yptd-pin"),yti_up=dg("yptd-up"),yti_dwn=dg("yptd-dwn");yti_in.addEventListener("input",yte_in),yti_off.addEventListener("click",yte_off),yti_pit.addEventListener("click",yte_pit),yti_up.addEventListener("click",yte_up),yti_dwn.addEventListener("click",yte_dwn);var interval=setInterval(function(){pitch()},100);})();`;
 
-    <canvas id="gameCanvas"></canvas>
-
-    <script type="module" src="game.js"></script>
+        function copyJS() {
+            navigator.clipboard.writeText(bookmarkletCode).then(() => {
+                alert("Đã copy mã Bookmarklet! Bây giờ hãy dán nó vào URL của một dấu trang trên iPhone.");
+            });
+        }
+    </script>
 </body>
 </html>
