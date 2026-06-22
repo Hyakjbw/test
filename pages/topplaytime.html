@@ -5,15 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Top Playtime - Dân Cày Chăm Chỉ</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="dashboard-container">
-        
+    <!-- Shader Background đồng bộ -->
+    <canvas id="shader-canvas"></canvas>
+    <div class="shader-overlay"></div>
+
+    <div class="main-wrapper">
         <header class="page-header">
             <a href="../index.html" class="btn-back">⬅ Quay Về Trang Chủ</a>
             <div class="page-title-box">
-                <h2>⏱️ Bảng Xếp Hạng Chăm Chỉ (Top Playtime)</h2>
-                <p>Vinh danh 50 game thủ có thời gian online cống hiến nhiều nhất tại TreMC</p>
+                <h2>⏱️ Bảng Xếp Hạng Chăm Chỉ</h2>
+                <p>Vinh danh 50 game thủ cống hiến nhiều nhất tại TreMC</p>
             </div>
         </header>
 
@@ -21,72 +25,52 @@
             <table class="leaderboard-table">
                 <thead>
                     <tr>
-                        <th style="width: 15%; text-align: center;">Hạng</th>
-                        <th style="width: 55%;">Tên Người Chơi</th>
-                        <th style="width: 30%; text-align: right;">Thời Gian Đã Chơi</th>
+                        <th style="text-align: center;">Hạng</th>
+                        <th>Tên Người Chơi</th>
+                        <th style="text-align: right;">Thời Gian</th>
                     </tr>
                 </thead>
-                <tbody id="leaderboard-body">
-                    </tbody>
+                <tbody id="leaderboard-body"></tbody>
             </table>
         </main>
     </div>
 
+    <script src="../js/shader.js"></script> <!-- Gọi shader -->
     <script src="../js/Data.js"></script>
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const tbody = document.getElementById('leaderboard-body');
-            
-            // Kiểm tra tệp dữ liệu chung xem có bị lỗi không
             if (typeof tremcData === 'undefined') {
-                console.error("❌ Không tìm thấy biến tremcData từ file ../js/Data.js!");
-                if (tbody) {
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #ff5252; padding: 30px; font-weight: bold;">⚠️ Lỗi: Không thể tải dữ liệu thời gian chơi!</td></tr>`;
-                }
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #ff5252; padding: 30px;">⚠️ Lỗi tải dữ liệu!</td></tr>`;
                 return;
             }
 
-            // Gọi đúng mảng dữ liệu thời gian chơi của bạn
             const dataList = tremcData.topplaytime || [];
-
-            // Kiểm tra mảng rỗng
             if (dataList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #a4f43c; padding: 30px;">Chưa có dữ liệu thống kê tuần này.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--primary); padding: 30px;">Chưa có dữ liệu.</td></tr>`;
                 return;
             }
 
-            // Tiến hành vòng lặp đổ dữ liệu và gán hiệu ứng Top 3
             dataList.forEach((player, index) => {
                 const rank = index + 1;
                 let rankBadge = rank;
                 let rowClass = "";
 
-                // Phân loại class dòng cho Top 3 để lấy hiệu ứng background đổ bóng bên CSS
-                if (rank === 1) {
-                    rankBadge = `🥇`;
-                    rowClass = `class="rank-first"`;
-                } else if (rank === 2) {
-                    rankBadge = `🥈`;
-                    rowClass = `class="rank-second"`;
-                } else if (rank === 3) {
-                    rankBadge = `🥉`;
-                    rowClass = `class="rank-third"`;
-                }
-
-                // Lấy biến dữ liệu giờ chơi của bạn và gắn đơn vị
-                const formattedTime = player.timePlayer + " giờ";
+                if (rank === 1) { rankBadge = `🥇`; rowClass = "rank-first"; }
+                else if (rank === 2) { rankBadge = `🥈`; rowClass = "rank-second"; }
+                else if (rank === 3) { rankBadge = `🥉`; rowClass = "rank-third"; }
 
                 const row = document.createElement('tr');
-                if (rowClass) row.setAttribute('class', rowClass.replace('class="', '').replace('"', ''));
+                if (rowClass) row.className = rowClass;
                 
                 row.innerHTML = `
-                    <td class="rank-col">${rankBadge}</td>
-                    <td class="player-col">
-                        <span class="player-avatar" style="background: #122224; color: #00f0ff;">⏱️</span> 
+                    <td style="text-align: center; font-weight: 800;">${rankBadge}</td>
+                    <td>
+                        <span class="player-avatar">⏱️</span> 
                         <strong>${player.player_name}</strong>
                     </td>
-                    <td class="money-col" style="color: #00f0ff;">${formattedTime}</td>
+                    <td style="text-align: right; color: #00f0ff; font-family: monospace; font-weight: bold;">${player.timePlayer} giờ</td>
                 `;
                 tbody.appendChild(row);
             });
