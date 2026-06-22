@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TreMC - Trang Chủ</title>
+    <title>TreMC - Trang chủ</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Thêm font Google để giao diện hiện đại hơn -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Lớp phủ Shader Background -->
+    <div class="shader-overlay"></div>
+    <div class="ambient-light"></div>
+
     <div class="dashboard-container">
-    
-        <header class="main-header">
+        <header class="main-header animate-fade-in">
             <div class="server-logo">
+                <div class="logo-glow"></div>
                 <img src="images/logo.png" alt="TreMC Logo" class="logo-img"> 
                 <h1 class="logo-text">TreMC</h1>
             </div>
@@ -37,7 +43,7 @@
             </div>
         </header>
 
-        <section class="menu-grid">
+        <section class="menu-grid animate-fade-in-delay">
             <a href="pages/toptier.html" class="menu-card">
                 <div class="card-icon">🎖️</div>
                 <div class="card-body">
@@ -77,8 +83,8 @@
             <a href="pages/updates.html" class="menu-card">
                 <div class="card-icon">⚙️</div>
                 <div class="card-body">
-                    <h3>Nhật Ký Phát Triển và Cập Nhật Của Server</h3>
-                    <p>Xem các tính năng mới, sửa lỗi và các thay đổi trong các phiên bản gần đây.</p>
+                    <h3>Nhật Ký Cập Nhật</h3>
+                    <p>Xem các tính năng mới, sửa lỗi và các thay đổi trong các phiên bản.</p>
                 </div>
                 <span class="arrow-go">→</span>
             </a>
@@ -87,45 +93,44 @@
                 <div class="card-icon">🛠️</div>
                 <div class="card-body">
                     <h3>Hệ Thống Quản Lý</h3>
-                    <p>Khu vực dành riêng cho Ban Quản Trị và các Admin điều hành Server.</p>
+                    <p>Khu vực dành riêng cho Ban Quản Trị và các Admin điều hành.</p>
                 </div>
                 <span class="arrow-go">→</span>
             </a>
         </section>
 
-        <section class="info-block-section">
+        <section class="info-block-section animate-fade-in-delay-2">
             <div class="info-container">
-                <div class="about-server-box">
+                <div class="about-server-box glass-card">
                     <h2 class="section-title">⚔️ Về Thế Giới TreMC</h2>
                     <p class="about-text">
-                        <strong>💰 Hệ Thống Kinh Tế (Economy) Định Hướng Cày Cuốc:</strong>
-                        Tại TreMC, kinh tế là nền tảng. Tận dụng thị trường giao thương (Shop/sell/ah) để tích lũy tài sản, leo top.
+                        <strong>💰 Hệ Thống Kinh Tế:</strong>
+                        Tận dụng thị trường giao thương (Shop/sell/ah) để tích lũy tài sản và leo top.
                     </p>
                     <p class="about-text">
-                        <strong>⚔️ Hệ thống PvP Đẳng Cấp Kỹ Năng:</strong>
-                        Crystal PvP bị cấm, sẽ không gây sát thương khi dùng, và hệ thống pvp được tối ưu để đảm bảo một chiến trường công bằng. Tại đây, chiến thắng được quyết định hoàn toàn bởi khả năng kiểm soát combo, di chuyển, nhịp độ tấn công và sự nhạy bén của bạn. Đây là nơi kỹ năng PvP truyền thống được phát huy đối đa.
+                        <strong>⚔️ PvP Kỹ Năng:</strong>
+                        Crystal PvP bị cấm. Chiến thắng được quyết định bởi khả năng combo, di chuyển và sự nhạy bén.
                     </p>
                 </div>
 
-                <div class="gallery-server-box">
+                <div class="gallery-server-box glass-card">
                     <h2 class="section-title">📸 Hình Ảnh Server</h2>
                     <div class="image-grid">
                         <div class="gallery-item">
                             <img src="images/img1.png" alt="Khu vực Spawn" onerror="this.src='https://placehold.co/600x400/1a331e/ffffff?text=Khu+Vực+Spawn'">
-                            <span class="img-caption">🏰 Trung Tâm Thương Mại & Spawn</span>
+                            <span class="img-caption">🏰 Trung Tâm Thương Mại</span>
                         </div>
                         <div class="gallery-item">
                             <img src="images/img3.png" alt="Đấu Trường PvP" onerror="this.src='https://placehold.co/600x400/1a331e/ffffff?text=Đấu+Trường+PvP'">
-                            <span class="img-caption">⚔️ Đấu Trường PvP Đẳng Cấp</span>
+                            <span class="img-caption">⚔️ Đấu Trường PvP</span>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="guide-block-section">
-            <h2 class="section-title" style="text-align: center; margin-bottom: 20px;">🎮 Cách Tham Gia Server TreMC</h2>
-            
+        <section class="guide-block-section glass-card animate-fade-in-delay-2">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 30px;">🎮 Cách Tham Gia Server TreMC</h2>
             <div class="guide-grid">
                 <div class="guide-card">
                     <div class="guide-card-header">
@@ -133,89 +138,66 @@
                         <h3>Lối vào bản JAVA (PC)</h3>
                     </div>
                     <div class="guide-image-container">
-                        <img src="images/lpc.png" alt="Cách vào Minecraft Java PC" onerror="this.src='https://placehold.co/600x350/1a331e/bbf754?text=Multiplayer+-%3E+Add+Server+-%3E+Dán+IP'">
+                        <img src="images/lpc.png" alt="Java PC" onerror="this.src='https://placehold.co/600x350/1a331e/bbf754?text=Multiplayer+-%3E+Add+Server'">
                     </div>
-                    <p class="guide-mini-desc">Vào <strong>Multiplayer</strong> &rarr; <strong>Add Server</strong> &rarr; Nhập IP: <span class="highlight-code">tremc.omline:25623</span></p>
+                    <p class="guide-mini-desc">Vào <strong>Multiplayer</strong> &rarr; <strong>Add Server</strong> &rarr; IP: <span class="highlight-code">tremc.omline:25623</span></p>
                 </div>
 
                 <div class="guide-card">
                     <div class="guide-card-header">
                         <span class="guide-platform-icon">📱</span>
-                        <h3>Lối vào bản PE (Điện thoại)</h3>
+                        <h3>Lối vào bản PE (Mobile)</h3>
                     </div>
                     <div class="guide-image-container">
-                        <img src="images/lpe.png" alt="Cách vào Minecraft PE Điện thoại" onerror="this.src='https://placehold.co/600x350/1a331e/00f0ff?text=Tab+Servers+-%3E+Add+Server+-%3E+IP+vấn+Port'">
+                        <img src="images/lpe.png" alt="PE Mobile" onerror="this.src='https://placehold.co/600x350/1a331e/00f0ff?text=Tab+Servers+-%3E+Add+Server'">
                     </div>
-                    <p class="guide-mini-desc">Vào Tab <strong>Servers</strong> &rarr; <strong>Add Server</strong> &rarr; IP: <span class="highlight-code">tremc.omline</span> | Port: <span class="highlight-code">25623</span></p>
+                    <p class="guide-mini-desc">Vào <strong>Servers</strong> &rarr; <strong>Add Server</strong> &rarr; IP: <span class="highlight-code">tremc.omline</span> | Port: <span class="highlight-code">25623</span></p>
                 </div>
             </div>
         </section>
     
-    <!-- ================= PHẦN BỔ SUNG MỚI (DƯỚI MENU CŨ) ================= -->
-    <div class="additional-info-wrapper">
+        <div class="additional-info-wrapper animate-fade-in-delay-2">
+            <section class="content-block glass-card">
+                <h2 class="section-title">⚖️ Nội Quy Máy Chủ</h2>
+                <ul class="rules-list">
+                    <li><strong>Gian lận (Hack/Cheat):</strong> Nghiêm cấm tuyệt đối việc sử dụng phần mềm thứ 3, X-ray, hack client.</li>
+                    <li><strong>Văn hóa ứng xử:</strong> Giữ thái độ lịch sự. Nghiêm cấm hành vi toxic, xúc phạm người chơi khác.</li>
+                    <li><strong>Hình thức xử lý:</strong> Cảnh cáo $\rightarrow$ Khóa tạm thời $\rightarrow$ Khóa vĩnh viễn (Ban).</li>
+                </ul>
+            </section>
 
-        <!-- 1. KHUNG LUẬT SERVER -->
-        <section class="content-block">
-            <h2 class="section-title">⚖️ Nội Quy Máy Chủ</h2>
-            <ul class="rules-list">
-                <li><strong>Gian lận (Hack/Cheat):</strong> Nghiêm cấm tuyệt đối việc sử dụng phần mềm thứ 3, X-ray, hack client hoặc bất kỳ công cụ nào can thiệp vào game để tạo lợi thế bất chính.</li>
-                <li><strong>Văn hóa ứng xử:</strong> Giữ thái độ lịch sự. Nghiêm cấm các hành vi xúc phạm, toxic, gây hấn hoặc sử dụng ngôn từ thô tục, công kích người chơi khác.</li>
-                <li><strong>Hình thức xử lý:</strong> Mọi hành vi vi phạm sẽ bị xử lý nghiêm khắc tùy theo mức độ, từ cảnh cáo, khóa tài khoản tạm thời (từ 1 ngày) cho đến khóa vĩnh viễn (ban vĩnh viễn).</li>
-            </ul>
-        </section>
-
-        <!-- 2. KHUNG LỆNH CƠ BẢN -->
-        <section class="content-block">
-            <h2 class="section-title">📜 Lệnh Cơ Bản</h2>
-            <div class="commands-grid">
-                <div><code>/spawn</code> : Quay về trung tâm.</div>
-                <div><code>/sethome [tên]</code> : Đặt điểm hồi hương.</div>
-                <div><code>/home [tên]</code> : Dịch chuyển về nhà.</div>
-                <div><code>/delhome [tên]</code> : Xóa điểm hồi hương.</div>
-                <div><code>/tpa [tên]</code> : Gửi yêu cầu dịch chuyển tới người chơi.</div>
-                <div><code>/tpaccept</code> : Đồng ý lời mời dịch chuyển.</div>
-                <div><code>/back</code> : Quay lại vị trí trước đó (sau khi chết hoặc teleport).</div>
-
-                <div><code>/pay [tên] [số tiền]</code> : Chuyển tiền cho người chơi khác.</div>
-                <div><code>/shop</code> : Mở cửa hàng mua bán vật phẩm.</div>
-                <div><code>/sellgui</code> : Mở bảng bán hàng nhanh.</div>
-                <div><code>/ah</code> : Mở chợ người chơi (Auction House).</div>
-                <div><code>/ah sell [giá]</code> : Đăng bán vật phẩm lên chợ.</div>
-
-                <div><code>/kit</code> : Nhận các bộ vật phẩm khởi đầu.</div>
-                <div><code>/msg [tên] [nội dung]</code> : Nhắn tin riêng.</div>
-                <div><code>/help</code> : Xem bảng hướng dẫn chung.</div>
-                <div><code>Các lệnh khác đang được cập nhật...</code></div>
-            </div>
-        </section>
-
-    </div>
-
+            <section class="content-block glass-card">
+                <h2 class="section-title">📜 Lệnh Cơ Bản</h2>
+                <div class="commands-grid">
+                    <div><code>/spawn</code> : Về trung tâm.</div>
+                    <div><code>/sethome [tên]</code> : Đặt nhà.</div>
+                    <div><code>/home [tên]</code> : Về nhà.</div>
+                    <div><code>/tpa [tên]</code> : Yêu cầu teleport.</div>
+                    <div><code>/tpaccept</code> : Đồng ý teleport.</div>
+                    <div><code>/pay [tên] [tiền]</code> : Chuyển tiền.</div>
+                    <div><code>/shop</code> : Mở cửa hàng.</div>
+                    <div><code>/ah</code> : Chợ người chơi.</div>
+                    <div><code>/kit</code> : Nhận vật phẩm.</div>
+                    <div><code>/msg [tên] [nội dung]</code> : Nhắn tin.</div>
+                </div>
+            </section>
+        </div>
     </div>
     
     <script>
         function copyIP() {
             const ipText = document.getElementById('server-ip').innerText;
             const btnText = document.getElementById('copy-btn-text');
-            
             navigator.clipboard.writeText(ipText).then(() => {
-                // Đổi giao diện nút khi sao chép thành công
                 btnText.innerText = "ĐÃ CHÉP! ✓";
-                btnText.style.backgroundColor = "#a4f43c";
-                btnText.style.color = "#000";
-                
-                // Khôi phục lại trạng thái nút sau 2 giây
+                btnText.classList.add('copied');
                 setTimeout(() => {
                     btnText.innerText = "SAO CHÉP";
-                    btnText.style.backgroundColor = "rgba(164, 244, 60, 0.1)";
-                    btnText.style.color = "#a4f43c";
+                    btnText.classList.remove('copied');
                 }, 2000);
-            }).catch(err => {
-                console.error('Lỗi, không thể sao chép IP: ', err);
             });
         }
     </script>
-    
     <script src="app.js"></script>
     <script src="GetData.js"></script>
 </body>
