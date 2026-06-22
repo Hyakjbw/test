@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhật Ký Cập Nhật - TreMC</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="page-header">
+            <a href="../index.html" class="btn-back">⬅ Quay Về Trang Chủ</a>
+            <div class="page-title-box">
+                <h2>⚙️ Nhật Ký Cập Nhật Server</h2>
+            </div>
+        </header>
+
+        <main class="changelog-container" id="changelog-list"></main>
+    </div>
+
+    <script type="module">
+        import { changelogData } from '../js/changelog.js';
+
+        const container = document.getElementById('changelog-list');
+        
+        container.innerHTML = changelogData.map(item => `
+            <div class="update-block-card">
+                <div class="block-card-header">
+                    <span class="block-version">🚀 Season ${item.season}</span>
+                    <span class="block-date">📅 ${item.date}</span>
+                </div>
+                <h3 class="block-title">${item.title}</h3>
+                <div class="block-content">
+                    ${item.changes.map(c => `<div class="content-item"><span class="bullet">▪</span> ${c}</div>`).join('')}
+                </div>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Nạp Thẻ - Vinh Danh Mạnh Thường Quân</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <header class="page-header">
+            <a href="../index.html" class="btn-back">⬅ Quay Về Trang Chủ</a>
+            <div class="page-title-box">
+                <h2>💎 Bảng Vàng Đại Gia (Top Donate)</h2>
+                <p>Tri ân và vinh danh những Mạnh Thường Quân đã ủng hộ duy trì server TreMC</p>
+            </div>
+        </header>
+
+        <main class="table-wrapper">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%; text-align: center;">Hạng</th>
+                        <th style="width: 55%;">Tên Người Chơi</th>
+                        <th style="width: 30%; text-align: right;">Tổng Tiền Tích Lũy</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="../js/Data.js"></script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('leaderboard-body');
+            
+            // 1. Kiểm tra tính sẵn sàng của tệp cơ sở dữ liệu
+            if (typeof tremcData === 'undefined') {
+                console.error("❌ Không tìm thấy biến tremcData từ file ../js/Data.js!");
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #ff5252; padding: 30px; font-weight: bold;">⚠️ Lỗi: Không thể kết nối hệ thống dữ liệu nạp!</td></tr>`;
+                }
+                return;
+            }
+
+            // Lấy chính xác mảng dữ liệu nạp thẻ từ file Data.js như cũ của bạn
+            const dataList = tremcData.topdonnet || []; 
+
+            // 2. Kiểm tra nếu danh sách trống
+            if (dataList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #a4f43c; padding: 30px;">Chưa có dữ liệu đóng góp trong tháng này.</td></tr>`;
+                return;
+            }
+
+            // 3. Vòng lặp kết xuất dữ liệu lên bảng
+            dataList.forEach((player, index) => {
+                const rank = index + 1;
+                let rankBadge = rank;
+                let rowClass = "";
+
+                // Gán class xếp hạng đặc biệt để nhận hiệu ứng CSS phát sáng
+                if (rank === 1) {
+                    rankBadge = `🥇`;
+                    rowClass = `class="rank-first"`;
+                } else if (rank === 2) {
+                    rankBadge = `🥈`;
+                    rowClass = `class="rank-second"`;
+                } else if (rank === 3) {
+                    rankBadge = `🥉`;
+                    rowClass = `class="rank-third"`;
+                }
+
+                // Định dạng hiển thị tiền tệ VNĐ (Ví dụ từ 100000 thành 100,000 VNĐ)
+                const formattedDonate = player.donnet.toLocaleString() + " VNĐ";
+
+                const row = document.createElement('tr');
+                if (rowClass) row.setAttribute('class', rowClass.replace('class="', '').replace('"', ''));
+                
+                row.innerHTML = `
+                    <td class="rank-col">${rankBadge}</td>
+                    <td class="player-col">
+                        <span class="player-avatar" style="background: #241215; color: #f43f5e;">💎</span> 
+                        <strong>${player.player_name}</strong>
+                    </td>
+                    <td class="money-col" style="color: #ff4a6b;">${formattedDonate}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+    </script>
+</body>
+</html>

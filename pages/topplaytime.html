@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Playtime - Dân Cày Chăm Chỉ</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <header class="page-header">
+            <a href="../index.html" class="btn-back">⬅ Quay Về Trang Chủ</a>
+            <div class="page-title-box">
+                <h2>⏱️ Bảng Xếp Hạng Chăm Chỉ (Top Playtime)</h2>
+                <p>Vinh danh 50 game thủ có thời gian online cống hiến nhiều nhất tại TreMC</p>
+            </div>
+        </header>
+
+        <main class="table-wrapper">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%; text-align: center;">Hạng</th>
+                        <th style="width: 55%;">Tên Người Chơi</th>
+                        <th style="width: 30%; text-align: right;">Thời Gian Đã Chơi</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="../js/Data.js"></script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('leaderboard-body');
+            
+            // Kiểm tra tệp dữ liệu chung xem có bị lỗi không
+            if (typeof tremcData === 'undefined') {
+                console.error("❌ Không tìm thấy biến tremcData từ file ../js/Data.js!");
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #ff5252; padding: 30px; font-weight: bold;">⚠️ Lỗi: Không thể tải dữ liệu thời gian chơi!</td></tr>`;
+                }
+                return;
+            }
+
+            // Gọi đúng mảng dữ liệu thời gian chơi của bạn
+            const dataList = tremcData.topplaytime || [];
+
+            // Kiểm tra mảng rỗng
+            if (dataList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #a4f43c; padding: 30px;">Chưa có dữ liệu thống kê tuần này.</td></tr>`;
+                return;
+            }
+
+            // Tiến hành vòng lặp đổ dữ liệu và gán hiệu ứng Top 3
+            dataList.forEach((player, index) => {
+                const rank = index + 1;
+                let rankBadge = rank;
+                let rowClass = "";
+
+                // Phân loại class dòng cho Top 3 để lấy hiệu ứng background đổ bóng bên CSS
+                if (rank === 1) {
+                    rankBadge = `🥇`;
+                    rowClass = `class="rank-first"`;
+                } else if (rank === 2) {
+                    rankBadge = `🥈`;
+                    rowClass = `class="rank-second"`;
+                } else if (rank === 3) {
+                    rankBadge = `🥉`;
+                    rowClass = `class="rank-third"`;
+                }
+
+                // Lấy biến dữ liệu giờ chơi của bạn và gắn đơn vị
+                const formattedTime = player.timePlayer + " giờ";
+
+                const row = document.createElement('tr');
+                if (rowClass) row.setAttribute('class', rowClass.replace('class="', '').replace('"', ''));
+                
+                row.innerHTML = `
+                    <td class="rank-col">${rankBadge}</td>
+                    <td class="player-col">
+                        <span class="player-avatar" style="background: #122224; color: #00f0ff;">⏱️</span> 
+                        <strong>${player.player_name}</strong>
+                    </td>
+                    <td class="money-col" style="color: #00f0ff;">${formattedTime}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+    </script>
+</body>
+</html>

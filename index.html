@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TreMC - Thế Giới Minecraft Đỉnh Cao</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Shader Background Effect -->
+    <div class="bg-visuals">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <header class="main-header reveal">
+            <div class="server-logo">
+                <div class="logo-glow"></div>
+                <img src="images/logo.png" alt="TreMC Logo" class="logo-img"> 
+                <h1 class="logo-text">TreMC</h1>
+            </div>
+            <p class="server-slogan">Chào mừng bạn đến với Server Minecraft TreMC</p>
+            
+            <div class="connection-hub">
+                <div class="hub-box ip-box" onclick="copyIP()" title="Click để sao chép nhanh IP">
+                    <div class="hub-icon">⚡</div>
+                    <div class="hub-details">
+                        <span class="hub-label">ĐỊA CHỈ IP SERVER</span>
+                        <strong id="server-ip" class="hub-value">tremc.omline:25623</strong>
+                    </div>
+                    <button class="btn-hub-action" id="copy-btn-text">SAO CHÉP</button>
+                </div>
+
+                <a href="https://discord.gg/cM5XbJmZe" target="_blank" class="hub-box discord-box" title="Click để tham gia Discord">
+                    <div class="hub-icon">💬</div>
+                    <div class="hub-details">
+                        <span class="hub-label">CỘNG ĐỒNG DISCORD</span>
+                        <strong class="hub-value">discord.gg/cM5XbJmZe</strong>
+                    </div>
+                    <span class="btn-hub-action">THAM GIA</span>
+                </a>
+            </div>
+        </header>
+
+        <section class="menu-grid">
+            <!-- Thêm class reveal cho tất cả các card để chạy animation cuộn -->
+            <a href="pages/toptier.html" class="menu-card reveal">
+                <div class="card-icon">🎖️</div>
+                <div class="card-body">
+                    <h3>Bảng Xếp Hạng Tier</h3>
+                    <p>Xem ai là cao thủ có kỹ năng chiến đấu và thứ hạng cao nhất.</p>
+                </div>
+                <div class="arrow-go">→</div>
+            </a>
+
+            <a href="pages/topbal.html" class="menu-card reveal">
+                <div class="card-icon">💰</div>
+                <div class="card-body">
+                    <h3>Top Giàu Nhất</h3>
+                    <p>Vinh danh những triệu phú nắm giữ nền kinh tế của TreMC.</p>
+                </div>
+                <div class="arrow-go">→</div>
+            </a>
+
+            <a href="pages/topplaytime.html" class="menu-card reveal">
+                <div class="card-icon">⏱️</div>
+                <div class="card-body">
+                    <h3>Thời Gian Chơi</h3>
+                    <p>Nơi vinh danh những "dân cày" chân chính online khủng nhất.</p>
+                </div>
+                <div class="arrow-go">→</div>
+            </a>
+
+            <a href="pages/topdonate.html" class="menu-card reveal">
+                <div class="card-icon">💎</div>
+                <div class="card-body">
+                    <h3>Top Donate</h3>
+                    <p>Cảm ơn các mạnh thường quân đã ủng hộ duy trì server.</p>
+                </div>
+                <div class="arrow-go">→</div>
+            </a>
+
+            <a href="pages/updates.html" class="menu-card reveal">
+                <div class="card-icon">⚙️</div>
+                <div class="card-body">
+                    <h3>Nhật Ký Cập Nhật</h3>
+                    <p>Xem các tính năng mới và các thay đổi trong phiên bản gần đây.</p>
+                </div>
+                <div class="arrow-go">→</div>
+            </a>
+
+            <a href="pages/manager.html" class="menu-card admin-card reveal">
+                <div class="card-icon">🛠️</div>
+                <div class="card-body">
+                    <h3>Hệ Thống Quản Lý</h3>
+                    <p>Khu vực dành riêng cho Ban Quản Trị và các Admin.</p>
+                </div>
+                <div class="arrow-go">→</div>
+            </a>
+        </section>
+
+        <section class="info-block-section reveal">
+            <div class="info-container">
+                <div class="about-server-box">
+                    <h2 class="section-title">⚔️ Về Thế Giới TreMC</h2>
+                    <div class="about-content">
+                        <p class="about-text">
+                            <span class="highlight-keyword">💰 Kinh Tế Cày Cuốc:</span> 
+                            Tại TreMC, kinh tế là nền tảng. Tận dụng thị trường giao thương (Shop/sell/ah) để tích lũy tài sản, leo top.
+                        </p>
+                        <p class="about-text">
+                            <span class="highlight-keyword">⚔️ PvP Kỹ Năng:</span> 
+                            Crystal PvP bị cấm. Chiến thắng được quyết định bởi khả năng kiểm soát combo, di chuyển và nhịp độ tấn công.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gallery-server-box">
+                    <h2 class="section-title">📸 Hình Ảnh Server</h2>
+                    <div class="image-grid">
+                        <div class="gallery-item">
+                            <img src="images/img1.png" alt="Spawn" onerror="this.src='https://placehold.co/600x400/1a331e/ffffff?text=Khu+Vực+Spawn'">
+                            <div class="img-overlay"><span class="img-caption">🏰 Trung Tâm Spawn</span></div>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="images/img3.png" alt="PvP" onerror="this.src='https://placehold.co/600x400/1a331e/ffffff?text=Đấu+Trường+PvP'">
+                            <div class="img-overlay"><span class="img-caption">⚔️ Đấu Trường PvP</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="guide-block-section reveal">
+            <h2 class="section-title center">🎮 Cách Tham Gia Server TreMC</h2>
+            <div class="guide-grid">
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-platform-icon">💻</span>
+                        <h3>Phiên bản JAVA (PC)</h3>
+                    </div>
+                    <div class="guide-image-container">
+                        <img src="images/lpc.png" alt="Java PC" onerror="this.src='https://placehold.co/600x350/1a331e/bbf754?text=Multiplayer+-%3E+Add+Server'">
+                    </div>
+                    <p class="guide-mini-desc">Multiplayer &rarr; Add Server &rarr; IP: <span class="highlight-code">tremc.omline:25623</span></p>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-platform-icon">📱</span>
+                        <h3>Phiên bản PE (Mobile)</h3>
+                    </div>
+                    <div class="guide-image-container">
+                        <img src="images/lpe.png" alt="PE Mobile" onerror="this.src='https://placehold.co/600x350/1a331e/00f0ff?text=Servers+-%3E+Add+Server'">
+                    </div>
+                    <p class="guide-mini-desc">Servers &rarr; Add Server &rarr; IP: <span class="highlight-code">tremc.omline</span> | Port: <span class="highlight-code">25623</span></p>
+                </div>
+            </div>
+        </section>
+    
+        <div class="additional-info-wrapper">
+            <section class="content-block reveal">
+                <h2 class="section-title">⚖️ Nội Quy Máy Chủ</h2>
+                <ul class="rules-list">
+                    <li><span><strong>Gian lận:</strong> Nghiêm cấm tuyệt đối Hack/Cheat, X-ray.</span></li>
+                    <li><span><strong>Ứng xử:</strong> Giữ thái độ lịch sự, không toxic.</span></li>
+                    <li><span><strong>Xử lý:</strong> Cảnh cáo $\rightarrow$ Ban tạm thời $\rightarrow$ Ban vĩnh viễn.</span></li>
+                </ul>
+            </section>
+
+            <section class="content-block reveal">
+                <h2 class="section-title">📜 Lệnh Cơ Bản</h2>
+                <div class="commands-grid">
+                    <div class="cmd-item"><code>/spawn</code> <span>Quay về trung tâm</span></div>
+                    <div class="cmd-item"><code>/sethome [tên]</code> <span>Đặt điểm hồi hương</span></div>
+                    <div class="cmd-item"><code>/home [tên]</code> <span>Dịch chuyển về nhà</span></div>
+                    <div class="cmd-item"><code>/tpa [tên]</code> <span>Yêu cầu dịch chuyển</span></div>
+                    <div class="cmd-item"><code>/tpaccept</code> <span>Đồng ý dịch chuyển</span></div>
+                    <div class="cmd-item"><code>/pay [tên] [số]</code> <span>Chuyển tiền</span></div>
+                    <div class="cmd-item"><code>/shop</code> <span>Mở cửa hàng</span></div>
+                    <div class="cmd-item"><code>/ah</code> <span>Chợ người chơi</span></div>
+                    <div class="cmd-item"><code>/kit</code> <span>Nhận vật phẩm</span></div>
+                    <div class="cmd-item"><code>/msg [tên]</code> <span>Nhắn tin riêng</span></div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <script>
+        // Copy IP Function
+        function copyIP() {
+            const ipText = document.getElementById('server-ip').innerText;
+            const btnText = document.getElementById('copy-btn-text');
+            navigator.clipboard.writeText(ipText).then(() => {
+                btnText.innerText = "ĐÃ CHÉP! ✓";
+                btnText.classList.add('success');
+                setTimeout(() => {
+                    btnText.innerText = "SAO CHÉP";
+                    btnText.classList.remove('success');
+                }, 2000);
+            });
+        }
+
+        // Scroll Reveal Animation
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

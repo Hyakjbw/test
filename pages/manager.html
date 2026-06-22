@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager - Hạn Chế Truy Cập</title>
+    <!-- Đường dẫn kết nối đến file CSS dùng chung của hệ thống Dashboard -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+        
+        <!-- KHUNG THÔNG BÁO LỖI QUYỀN TRUY CẬP (ĐỒNG BỘ STYLE KHUNG LỚN ĐẶC) -->
+        <main class="error-block-card" style="max-width: 550px; width: 100%; text-align: center; padding: 40px 30px;">
+            
+            <!-- Icon cảnh báo lớn cách điệu -->
+            <div class="error-icon-box">
+                <span class="lock-emoji">🔒</span>
+                <div class="error-code">403</div>
+            </div>
+
+            <h2 class="error-title">TRUY CẬP BỊ TỪ CHỐI!</h2>
+            
+            <p class="error-message">
+                Hệ thống nhận thấy tài khoản của bạn không nằm trong danh sách 
+                <strong style="color: #ff4a6b;">Ban Quản Trị (Admin)</strong> của cụm TreMC. 
+                Vui lòng không cố gắng truy cập sâu vào phân vùng này.
+            </p>
+
+            <div class="error-divider"></div>
+
+            <!-- Nút bấm lớn quay về trang chủ để người chơi thao tác nhanh -->
+            <a href="../index.html" class="btn-error-back">
+                🏠 QUAY VỀ TRANG CHỦ
+            </a>
+
+        </main>
+
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

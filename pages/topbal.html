@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Bal - Đại Phú Hào</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        
+        <header class="page-header">
+            <a href="../index.html" class="btn-back">⬅ Quay Về Trang Chủ</a>
+            <div class="page-title-box">
+                <h2>💰 Bảng Xếp Hạng Đại Phú Hào (Top Balance)</h2>
+                <p>Vinh danh 50 đại gia khét tiếng nắm giữ nền kinh tế của Server TreMC</p>
+            </div>
+        </header>
+
+        <main class="table-wrapper">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%; text-align: center;">Hạng</th>
+                        <th style="width: 55%;">Tên Người Chơi</th>
+                        <th style="width: 30%; text-align: right;">Số Dư Tài Sản</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="../js/Data.js"></script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('leaderboard-body');
+            
+            // Kiểm tra lỗi file data
+            if (typeof tremcData === 'undefined') {
+                console.error("❌ Không tìm thấy biến tremcData từ file ../js/Data.js!");
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #ff5252; padding: 30px; font-weight: bold;">⚠️ Lỗi: Không thể kết nối đến cơ sở dữ liệu!</td></tr>`;
+                }
+                return;
+            }
+
+            const dataList = tremcData.topbal || [];
+
+            // Kiểm tra dữ liệu rỗng
+            if (dataList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #a4f43c; padding: 30px;">Chưa có dữ liệu xếp hạng tuần này.</td></tr>`;
+                return;
+            }
+
+            // Duyệt data
+            dataList.forEach((player, index) => {
+                const rank = index + 1;
+                let rankBadge = rank;
+                let rowClass = "";
+
+                // Gán class đặc biệt cho Top 3 để tạo hiệu ứng CSS riêng
+                if (rank === 1) {
+                    rankBadge = `🥇`;
+                    rowClass = `class="rank-first"`;
+                } else if (rank === 2) {
+                    rankBadge = `🥈`;
+                    rowClass = `class="rank-second"`;
+                } else if (rank === 3) {
+                    rankBadge = `🥉`;
+                    rowClass = `class="rank-third"`;
+                }
+
+                const formattedMoney = player.money.toLocaleString() + " Xu";
+
+                const row = document.createElement('tr');
+                if (rowClass) row.setAttribute('class', rowClass.replace('class="', '').replace('"', ''));
+                
+                row.innerHTML = `
+                    <td class="rank-col">${rankBadge}</td>
+                    <td class="player-col">
+                        <span class="player-avatar">👤</span> 
+                        <strong>${player.player_name}</strong>
+                    </td>
+                    <td class="money-col">${formattedMoney}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+    </script>
+</body>
+</html>
